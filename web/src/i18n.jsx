@@ -1,0 +1,302 @@
+import { createContext, useContext, useState, useCallback } from 'react';
+
+export const translations = {
+  tr: {
+    'brand.title': 'TÜBİTAK Proje Yazma',
+    'brand.subtitle': 'Yeşil Dönüşüm · Sun & Sun Danışmanlık',
+    'pill.ready': 'Hazır',
+    'pill.notReady': 'Yapılandırılmadı',
+    'chatgpt.login': 'ChatGPT Giriş',
+    'chatgpt.loggingIn': 'Tarayıcıda giriş yapın…',
+    'chatgpt.ready': 'ChatGPT oturumu hazır',
+
+    'projects.title': 'Projeler',
+    'projects.subtitle': 'Yeni bir proje açın, analiz formunu doldurun, başvuruyu otomatik oluşturun.',
+    'projects.new': 'Yeni Proje',
+    'projects.empty.title': 'Henüz proje yok',
+    'projects.empty.hint': '“Yeni Proje” ile ilk başvurunuzu başlatın.',
+    'projects.loading': 'Yükleniyor…',
+    'projects.nameLabel': 'Proje adı',
+    'projects.namePlaceholder': 'Örn. Acme A.Ş. — 2026 Başvurusu',
+    'projects.create': 'Oluştur',
+    'projects.cancel': 'Vazgeç',
+    'projects.openDoc': 'Dokümanı aç',
+    'projects.deleteConfirm': 'Bu proje silinsin mi?',
+    'projects.delete': 'Sil',
+    'projects.count': 'proje',
+
+    'status.draft': 'Taslak',
+    'status.generating': 'Üretiliyor',
+    'status.done': 'Tamamlandı',
+    'status.error': 'Hata',
+
+    'detail.back': 'Projeler',
+    'detail.save': 'Kaydet',
+    'detail.saving': 'Kaydediliyor…',
+    'detail.generate': 'Başvuruyu Oluştur',
+    'detail.generating': 'Üretiliyor…',
+    'detail.form.title': 'Analiz Formu',
+    'detail.form.desc': 'Müşteri hakkındaki bilgileri girin. Yapay zeka bu verileri ve Obsidian bilgi grafiğindeki yazım kılavuzunu kullanır.',
+    'detail.files.title': 'Ek Belgeler',
+    'detail.files.desc': 'İş paketleri, ek analizler vb. (.txt, .md tercih edilir)',
+    'detail.files.upload': 'Dosya yükle',
+    'detail.files.empty': 'Henüz dosya yok',
+    'detail.sections.title': 'Üretilen Bölümler',
+    'detail.sections.charsSuffix': 'krk',
+    'detail.needCompany': 'Lütfen önce “Şirket Adı” alanını doldurun.',
+
+    'gen.title': 'Başvuru oluşturuluyor…',
+    'gen.start': 'Başlatılıyor…',
+    'gen.context': 'Şirket analizi özetleniyor…',
+    'gen.section': 'Bölüm {n}/13 yazılıyor…',
+    'gen.document': 'Google Dokümanı oluşturuluyor…',
+    'gen.share': 'Doküman paylaşılıyor…',
+    'gen.email': 'E-posta gönderiliyor…',
+    'gen.done': 'Tamamlandı',
+    'gen.ready': 'Başvuru hazır.',
+    'gen.openGoogleDoc': 'Google Dokümanını aç',
+    'gen.error': 'Üretim hatası',
+    'gen.steps': 'Bölümler',
+    'gen.estTime': 'Yaklaşık 2–4 dakika sürer',
+
+    'detail.saved': 'Kaydedildi',
+    'detail.unsaved': 'Kaydedilmemiş değişiklikler',
+    'detail.genDisabledTip': 'Üretim için ChatGPT girişi ve Google yapılandırması gerekli.',
+    'detail.group.profile': 'Şirket Künyesi',
+    'detail.group.context': 'Durum & Hedefler',
+    'detail.completeness': '{done}/{total} alan dolduruldu',
+    'detail.preview.show': 'Oku',
+    'detail.preview.hide': 'Gizle',
+
+    'setup.title': 'Kurulum tamamlanmadı',
+    'setup.body': 'Başvuru üretimi için {what} yapılandırılmalı. Adımlar için README dosyasına bakın.',
+    'setup.dismiss': 'Anladım',
+    'theme.toDark': 'Koyu temaya geç',
+    'theme.toLight': 'Açık temaya geç',
+
+    'field.companyName.label': 'Şirket Adı',
+    'field.companyName.ph': 'Örn. Acme Teknoloji A.Ş.',
+    'field.sector.label': 'Sektör',
+    'field.sector.ph': 'Örn. Yazılım, Üretim, Tekstil…',
+    'field.foundingYear.label': 'Kuruluş Yılı',
+    'field.foundingYear.ph': 'Örn. 2015',
+    'field.employees.label': 'Çalışan Sayısı',
+    'field.employees.ph': 'Örn. 45',
+    'field.revenue.label': 'Yıllık Ciro',
+    'field.revenue.ph': 'Örn. 8 Milyon TL',
+    'field.activities.label': 'Faaliyet Alanları',
+    'field.activities.ph': 'Şirketin ana ürün/hizmetleri…',
+    'field.challenges.label': 'Mevcut Zorluklar ve Sorunlar',
+    'field.challenges.ph': 'Yeşil dönüşüm açısından sorunlar, verimsizlikler…',
+    'field.rdStatus.label': 'Ar-Ge Durumu',
+    'field.rdStatus.ph': 'Ekip, yetkinlikler, patentler, projeler…',
+    'field.targetMarket.label': 'Hedef Pazar ve Müşteriler',
+    'field.targetMarket.ph': 'Müşteri profili, pazarlar…',
+    'field.infrastructure.label': 'Mevcut Altyapı',
+    'field.infrastructure.ph': 'Makine, ekipman, tesis, sertifikalar…',
+    'field.goals.label': 'Beklenen Kazanımlar / Hedefler',
+    'field.goals.ph': 'Projeden beklenen sonuçlar…',
+    'field.notes.label': 'Ek Notlar',
+    'field.notes.ph': 'Eklemek istediğiniz her şey…',
+
+    'projects.type': 'Proje Türü',
+    'projects.typePick': 'Proje türünü seçin',
+    'detail.group.project': 'Proje İhtiyacı ve Kapsamı',
+    'detail.group.capacity': 'Kapasite ve Altyapı',
+    'field.nace.label': 'NACE Kodu',
+    'field.nace.ph': 'Örn. 25.62',
+    'field.products.label': 'Ürünler ve Markalar',
+    'field.products.ph': 'Şirketin ürünleri ve markaları…',
+    'field.waterRegulationStatus.label': 'Su Verimliliği Yönetmeliği Kapsamı',
+    'field.waterRegulationStatus.ph': 'Kapsamda (zorunlu) / Gönüllü / Kapsam dışı',
+    'field.currentWaterUse.label': 'Mevcut Su Kullanımı',
+    'field.currentWaterUse.ph': 'Su kaynakları, tüketim, izleme durumu…',
+    'field.selectedProduct.label': 'Seçilen Ürün ve İşlevsel Birim',
+    'field.selectedProduct.ph': 'Karbon ayak izi hesaplanacak ürün ve işlevsel/beyan birimi…',
+    'field.carbonActivityData.label': 'Faaliyet Verileri',
+    'field.carbonActivityData.ph': 'Enerji, yakıt, hammadde, atık, lojistik, hizmet alımı verileri…',
+    'field.projectScope.label': 'Proje Kapsamı',
+    'field.projectScope.ph': 'Projenin kapsamı…',
+    'field.projectNeed.label': 'Projeye İhtiyaç Nedenleri',
+    'field.projectNeed.ph': 'Şirketin bu projeye neden ihtiyaç duyduğu (problem tanımının temeli)…',
+    'field.workToBeDone.label': 'Proje Kapsamında Yapılacak Çalışmalar',
+    'field.workToBeDone.ph': 'Proje kapsamında yapılacak işler (çözümlerin temeli)…',
+    'field.workPackages.label': 'İş Paketleri (Tablo)',
+    'field.workPackages.ph': 'Aylara göre iş paketleri ve çıktıları…',
+    'field.collaborations.label': 'Ulusal / Uluslararası İşbirlikleri',
+    'field.collaborations.ph': 'Müşteri, tedarikçi, ihracat, işbirlikleri…',
+    'field.pastProjects.label': 'Geçmiş Projeler ve Deneyim',
+    'field.pastProjects.ph': 'Önceki projeler, yatırımlar, yönetim sistemleri…'
+  },
+
+  en: {
+    'brand.title': 'TÜBİTAK Project Writing',
+    'brand.subtitle': 'Green Transformation · Sun & Sun Consulting',
+    'pill.ready': 'Ready',
+    'pill.notReady': 'Not configured',
+    'chatgpt.login': 'ChatGPT Login',
+    'chatgpt.loggingIn': 'Log in via the browser…',
+    'chatgpt.ready': 'ChatGPT session ready',
+
+    'projects.title': 'Projects',
+    'projects.subtitle': 'Open a project, fill in the analysis form, and generate the application automatically.',
+    'projects.new': 'New Project',
+    'projects.empty.title': 'No projects yet',
+    'projects.empty.hint': 'Start your first application with “New Project”.',
+    'projects.loading': 'Loading…',
+    'projects.nameLabel': 'Project name',
+    'projects.namePlaceholder': 'e.g. Acme Inc. — 2026 Application',
+    'projects.create': 'Create',
+    'projects.cancel': 'Cancel',
+    'projects.openDoc': 'Open document',
+    'projects.deleteConfirm': 'Delete this project?',
+    'projects.delete': 'Delete',
+    'projects.count': 'projects',
+
+    'status.draft': 'Draft',
+    'status.generating': 'Generating',
+    'status.done': 'Completed',
+    'status.error': 'Error',
+
+    'detail.back': 'Projects',
+    'detail.save': 'Save',
+    'detail.saving': 'Saving…',
+    'detail.generate': 'Generate Application',
+    'detail.generating': 'Generating…',
+    'detail.form.title': 'Analysis Form',
+    'detail.form.desc': 'Enter the customer details. The AI uses this data together with the writing guidelines in your Obsidian knowledge graph.',
+    'detail.files.title': 'Supporting Files',
+    'detail.files.desc': 'Work packages, extra analyses, etc. (.txt, .md preferred)',
+    'detail.files.upload': 'Upload file',
+    'detail.files.empty': 'No files yet',
+    'detail.sections.title': 'Generated Sections',
+    'detail.sections.charsSuffix': 'chars',
+    'detail.needCompany': 'Please fill in the “Company Name” field first.',
+
+    'gen.title': 'Generating application…',
+    'gen.start': 'Starting…',
+    'gen.context': 'Summarizing company analysis…',
+    'gen.section': 'Writing section {n}/13…',
+    'gen.document': 'Creating Google Document…',
+    'gen.share': 'Sharing document…',
+    'gen.email': 'Sending email…',
+    'gen.done': 'Completed',
+    'gen.ready': 'Application ready.',
+    'gen.openGoogleDoc': 'Open Google Doc',
+    'gen.error': 'Generation error',
+    'gen.steps': 'Sections',
+    'gen.estTime': 'Takes about 2–4 minutes',
+
+    'detail.saved': 'Saved',
+    'detail.unsaved': 'Unsaved changes',
+    'detail.genDisabledTip': 'Log into ChatGPT and configure Google to enable generation.',
+    'detail.group.profile': 'Company Profile',
+    'detail.group.context': 'Situation & Goals',
+    'detail.completeness': '{done}/{total} fields completed',
+    'detail.preview.show': 'Read',
+    'detail.preview.hide': 'Hide',
+
+    'setup.title': 'Setup incomplete',
+    'setup.body': 'Generation requires {what} to be configured. See the README for the steps.',
+    'setup.dismiss': 'Got it',
+    'theme.toDark': 'Switch to dark theme',
+    'theme.toLight': 'Switch to light theme',
+
+    'field.companyName.label': 'Company Name',
+    'field.companyName.ph': 'e.g. Acme Technology Inc.',
+    'field.sector.label': 'Sector',
+    'field.sector.ph': 'e.g. Software, Manufacturing, Textile…',
+    'field.foundingYear.label': 'Founding Year',
+    'field.foundingYear.ph': 'e.g. 2015',
+    'field.employees.label': 'Number of Employees',
+    'field.employees.ph': 'e.g. 45',
+    'field.revenue.label': 'Annual Revenue',
+    'field.revenue.ph': 'e.g. 8 Million TL',
+    'field.activities.label': 'Areas of Activity',
+    'field.activities.ph': 'Main products/services of the company…',
+    'field.challenges.label': 'Current Challenges & Problems',
+    'field.challenges.ph': 'Green-transformation problems, inefficiencies…',
+    'field.rdStatus.label': 'R&D Status',
+    'field.rdStatus.ph': 'Team, competencies, patents, projects…',
+    'field.targetMarket.label': 'Target Market & Customers',
+    'field.targetMarket.ph': 'Customer profile, markets…',
+    'field.infrastructure.label': 'Existing Infrastructure',
+    'field.infrastructure.ph': 'Machinery, equipment, facilities, certifications…',
+    'field.goals.label': 'Expected Gains / Goals',
+    'field.goals.ph': 'Expected outcomes of the project…',
+    'field.notes.label': 'Additional Notes',
+    'field.notes.ph': 'Anything else you would like to add…',
+
+    'projects.type': 'Project Type',
+    'projects.typePick': 'Choose the project type',
+    'detail.group.project': 'Project Need & Scope',
+    'detail.group.capacity': 'Capacity & Infrastructure',
+    'field.nace.label': 'NACE Code',
+    'field.nace.ph': 'e.g. 25.62',
+    'field.products.label': 'Products & Brands',
+    'field.products.ph': 'The company’s products and brands…',
+    'field.waterRegulationStatus.label': 'Water Efficiency Regulation Scope',
+    'field.waterRegulationStatus.ph': 'In scope (mandatory) / Voluntary / Out of scope',
+    'field.currentWaterUse.label': 'Current Water Use',
+    'field.currentWaterUse.ph': 'Water sources, consumption, monitoring status…',
+    'field.selectedProduct.label': 'Selected Product & Functional Unit',
+    'field.selectedProduct.ph': 'Product for the footprint and its functional/declared unit…',
+    'field.carbonActivityData.label': 'Activity Data',
+    'field.carbonActivityData.ph': 'Energy, fuel, raw materials, waste, logistics, procurement…',
+    'field.projectScope.label': 'Project Scope',
+    'field.projectScope.ph': 'The scope of the project…',
+    'field.projectNeed.label': 'Reasons the Company Needs the Project',
+    'field.projectNeed.ph': 'Why the company needs this project (basis of the problem definition)…',
+    'field.workToBeDone.label': 'Work to Be Done Within the Project',
+    'field.workToBeDone.ph': 'Work to be carried out in the project (basis of the solutions)…',
+    'field.workPackages.label': 'Work Packages (Table)',
+    'field.workPackages.ph': 'Work packages by month and their outputs…',
+    'field.collaborations.label': 'National / International Collaborations',
+    'field.collaborations.ph': 'Customers, suppliers, exports, partnerships…',
+    'field.pastProjects.label': 'Past Projects & Experience',
+    'field.pastProjects.ph': 'Previous projects, investments, management systems…'
+  }
+};
+
+/** 13 bölümün kısa başlıkları (üretim takip çubuğu için). */
+export const SECTION_TITLES = {
+  tr: [
+    'Proje Tanıtımı', 'Çağrı Uyumu', 'Problem Tanımı', 'Çözüm Önerileri',
+    'Proje Hedefleri', 'Metodoloji', 'İş Planı', 'Proje Yönetimi',
+    'Ar-Ge Kapasitesi', 'Proje Sonuçları', 'Beklenen Etki', 'Yaygın Etki', 'Sürdürülebilirlik'
+  ],
+  en: [
+    'Project Overview', 'Call Alignment', 'Problem Definition', 'Proposed Solutions',
+    'Project Goals', 'Methodology', 'Work Plan', 'Project Management',
+    'R&D Capacity', 'Project Outputs', 'Expected Impact', 'Wider Impact', 'Sustainability'
+  ]
+};
+
+const LangCtx = createContext(null);
+
+export function LanguageProvider({ children }) {
+  const [lang, setLangState] = useState(() => localStorage.getItem('lang') || 'tr');
+
+  const setLang = useCallback((l) => {
+    setLangState(l);
+    localStorage.setItem('lang', l);
+    document.documentElement.lang = l;
+  }, []);
+
+  const t = useCallback(
+    (key, vars) => {
+      let s = translations[lang]?.[key] ?? translations.tr[key] ?? key;
+      if (vars) for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, v);
+      return s;
+    },
+    [lang]
+  );
+
+  return <LangCtx.Provider value={{ lang, setLang, t }}>{children}</LangCtx.Provider>;
+}
+
+export function useI18n() {
+  const ctx = useContext(LangCtx);
+  if (!ctx) throw new Error('useI18n must be used within LanguageProvider');
+  return ctx;
+}

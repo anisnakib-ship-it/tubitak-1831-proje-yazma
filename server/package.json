@@ -1,0 +1,22 @@
+{
+  "name": "tubitak-1831-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend: projects, Obsidian knowledge graph, Claude generation, Google Docs + Gmail",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js",
+    "chatgpt:login": "node scripts/chatgpt-login.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "fflate": "^0.8.2",
+    "googleapis": "^144.0.0",
+    "multer": "^1.4.5-lts.1",
+    "nanoid": "^5.0.9",
+    "playwright": "^1.49.1"
+  }
+}

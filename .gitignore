@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Secrets & environment (NEVER commit)
+.env
+.env.*
+!.env.example
+server/.env
+**/.env
+!**/.env.example
+
+# Runtime data: SQLite DB, uploads, and the ChatGPT browser session (cookies!)
+server/data/
+
+# Build output
+web/dist/
+
+# Logs / OS
+*.log
+.DS_Store
+Thumbs.db
+
+# Local tooling
+.claude/
+
+# Obsidian workspace state (keep the notes, ignore Obsidian's local config)
+knowledge/.obsidian/
