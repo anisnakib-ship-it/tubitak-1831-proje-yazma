@@ -74,6 +74,7 @@ router.delete('/:id', (req, res) => {
 router.post('/:id/files', upload.array('files', 10), (req, res) => {
   const project = Projects.get(req.params.id);
   if (!project) return res.status(404).json({ error: 'Proje bulunamadı.' });
+  const kind = (req.body && req.body.kind) === 'workpackages' ? 'workpackages' : 'support';
   const added = [];
   for (const file of req.files || []) {
     const id = nanoid(10);
@@ -82,9 +83,10 @@ router.post('/:id/files', upload.array('files', 10), (req, res) => {
       projectId: project.id,
       originalName: file.originalname,
       storedPath: file.path,
-      mimeType: file.mimetype
+      mimeType: file.mimetype,
+      kind
     });
-    added.push({ id, original_name: file.originalname });
+    added.push({ id, original_name: file.originalname, kind });
   }
   res.status(201).json({ files: added });
 });

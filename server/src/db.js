@@ -30,6 +30,7 @@ db.exec(`
     original_name TEXT NOT NULL,
     stored_path   TEXT NOT NULL,
     mime_type     TEXT,
+    kind          TEXT NOT NULL DEFAULT 'support', -- support | workpackages
     created_at    TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
   );
@@ -49,7 +50,15 @@ db.exec(`
 try {
   const cols = db.prepare(`PRAGMA table_info(projects)`).all();
   if (!cols.some((c) => c.name === 'project_type')) {
-    db.exec(`ALTER TABLE projects ADD COLUMN project_type TEXT NOT NULL DEFAULT 'corporate-carbon'`);
+    db.exec(`ALTER TABLE projects ADD COLUMN project_type TEXT NOT NULL DEFAULT 'tubitak-1831'`);
+  }
+} catch { /* yok say */ }
+
+// Migration: files tablosuna kind sütununu ekle
+try {
+  const cols = db.prepare(`PRAGMA table_info(files)`).all();
+  if (!cols.some((c) => c.name === 'kind')) {
+    db.exec(`ALTER TABLE files ADD COLUMN kind TEXT NOT NULL DEFAULT 'support'`);
   }
 } catch { /* yok say */ }
 
@@ -100,10 +109,10 @@ export const Projects = {
 };
 
 export const Files = {
-  add({ id, projectId, originalName, storedPath, mimeType }) {
+  add({ id, projectId, originalName, storedPath, mimeType, kind = 'support' }) {
     db.prepare(
-      `INSERT INTO files (id, project_id, original_name, stored_path, mime_type) VALUES (?, ?, ?, ?, ?)`
-    ).run(id, projectId, originalName, storedPath, mimeType);
+      `INSERT INTO files (id, project_id, original_name, stored_path, mime_type, kind) VALUES (?, ?, ?, ?, ?, ?)`
+    ).run(id, projectId, originalName, storedPath, mimeType, kind);
   },
   listByProject(projectId) {
     return db.prepare(`SELECT * FROM files WHERE project_id = ?`).all(projectId);

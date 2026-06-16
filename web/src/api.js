@@ -25,9 +25,10 @@ export const api = {
   updateProject: (id, body) => req(`/api/projects/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   deleteProject: (id) => req(`/api/projects/${id}`, { method: 'DELETE' }),
 
-  uploadFiles: (id, fileList) => {
+  uploadFiles: (id, fileList, kind = 'support') => {
     const fd = new FormData();
     for (const f of fileList) fd.append('files', f);
+    fd.append('kind', kind);
     return fetch(`/api/projects/${id}/files`, { method: 'POST', body: fd }).then((r) => {
       if (!r.ok) throw new Error('Dosya yüklenemedi');
       return r.json();

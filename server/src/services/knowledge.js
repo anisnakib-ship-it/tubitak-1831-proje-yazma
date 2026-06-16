@@ -144,9 +144,12 @@ export function getSectionNote(vault, folder, n) {
 
 /**
  * Bir bölüm için kılavuz metnini derler (global notlar + bölüme bağlı notlar).
+ * @param {object} [opts]
+ * @param {boolean} [opts.includeGlobal=true] _global notları da dahil et.
+ *   Üretimde intro mesajı global notları zaten taşıdığı için false geçilir.
  */
-export function getGuidelineForSection(vault, index, n) {
-  const wanted = [...index.global, ...(index.perSection.get(n) || [])];
+export function getGuidelineForSection(vault, index, n, { includeGlobal = true } = {}) {
+  const wanted = [...(includeGlobal ? index.global : []), ...(index.perSection.get(n) || [])];
   const seen = new Set();
   const chunks = [];
   for (const link of wanted) {
@@ -166,7 +169,8 @@ export function vaultHealth() {
   const types = TEMPLATES.map((tpl) => {
     const index = parseIndex(vault, tpl.folder);
     const sections = [];
-    for (let n = 1; n <= 13; n++) {
+    const count = tpl.questionCount || 13;
+    for (let n = 1; n <= count; n++) {
       const g = getGuidelineForSection(vault, index, n);
       sections.push({ section: n, ok: g.trim().length > 0, chars: g.length });
     }

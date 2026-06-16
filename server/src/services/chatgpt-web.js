@@ -202,12 +202,12 @@ async function _runConversation({ introMessage, questions, onProgress = () => {}
   // 2) 13 soru (boş/eksik yanıtta yeniden dener)
   const answers = [];
   for (const q of questions) {
-    onProgress({ step: 'section', number: q.number, total: questions.length, title: q.title, message: `Bölüm ${q.number}/13: ${q.title}` });
+    onProgress({ step: 'section', number: q.number, total: questions.length, title: q.title, message: `Bölüm ${q.number}: ${q.title}` });
     const content = await askWithRetry(page, assistant, q.prompt, {
       retries: 2,
       onRetry: (n) => onProgress({
         step: 'section', number: q.number, total: questions.length, title: q.title,
-        message: `Bölüm ${q.number}/13 yeniden deneniyor (${n})...`
+        message: `Bölüm ${q.number} yeniden deneniyor (${n})...`
       })
     });
     answers.push({ number: q.number, title: q.title, content });

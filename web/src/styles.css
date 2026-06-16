@@ -292,10 +292,21 @@ body::before {
 .field input:focus, .field textarea:focus { outline: none; border-color: var(--moss);
   box-shadow: 0 0 0 3px rgba(63,115,80,0.16); background: var(--input-bg-focus); }
 
+/* Checklist fields */
+.checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 2px; }
+@media (max-width: 640px) { .checklist { grid-template-columns: 1fr; } }
+.check-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border: 1px solid var(--line);
+  border-radius: 9px; background: var(--input-bg); cursor: pointer; font-size: 13px; color: var(--ink-soft); transition: .12s; }
+.check-item:hover { border-color: var(--sage); }
+.check-item.on { border-color: var(--moss); background: var(--ok-bg); color: var(--ink); }
+.check-item input { margin-top: 2px; accent-color: var(--pine); flex-shrink: 0; }
+
 .upload { display: block; margin: 12px 0; padding: 20px; text-align: center; cursor: pointer;
   border: 1.5px dashed var(--sage); border-radius: var(--radius-s); color: var(--pine); font-weight: 700;
   font-size: 14px; transition: .15s; background: var(--paper-2); }
 .upload:hover { border-color: var(--moss); filter: brightness(1.02); }
+.upload-wp { border-color: var(--amber); color: var(--amber-2); background: var(--amber-soft); }
+.upload-wp:hover { border-color: var(--amber-2); }
 .files { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-direction: column; gap: 7px; font-size: 13.5px; }
 .files li { padding: 8px 11px; background: var(--paper-2); border-radius: 8px; }
 

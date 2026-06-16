@@ -1,31 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, Link, useOutletContext } from 'react-router-dom';
 import { api } from '../api.js';
-import { useI18n, SECTION_TITLES } from '../i18n.jsx';
-
-// field: [key, type, group, types?]  — types omitted = all project types
-const FIELDS = [
-  ['companyName', 'input', 'profile'],
-  ['sector', 'input', 'profile'],
-  ['nace', 'input', 'profile'],
-  ['employees', 'input', 'profile'],
-  ['products', 'textarea', 'profile'],
-
-  ['waterRegulationStatus', 'input', 'project', ['water-blue', 'water-carbon']],
-  ['currentWaterUse', 'textarea', 'project', ['water-blue', 'water-carbon']],
-  ['selectedProduct', 'textarea', 'project', ['product-carbon']],
-  ['carbonActivityData', 'textarea', 'project', ['corporate-carbon', 'water-carbon']],
-  ['projectScope', 'textarea', 'project'],
-  ['projectNeed', 'textarea', 'project'],
-  ['workToBeDone', 'textarea', 'project'],
-  ['workPackages', 'textarea', 'project'],
-
-  ['collaborations', 'textarea', 'capacity'],
-  ['pastProjects', 'textarea', 'capacity'],
-  ['infrastructure', 'textarea', 'capacity'],
-  ['notes', 'textarea', 'capacity']
-];
-const GROUPS = ['profile', 'project', 'capacity'];
+import { useI18n } from '../i18n.jsx';
+import { formFor } from '../forms.js';
 
 export default function ProjectDetail() {
   const { t, lang } = useI18n();
@@ -47,7 +24,14 @@ export default function ProjectDetail() {
     api.getProject(id).then((p) => {
       setProject(p);
       setName(p.name);
-      setAnalysis(p.analysis || {});
+      // apply field defaults (e.g. mentor) without marking dirty
+      const a = { ...(p.analysis || {}) };
+      for (const g of formFor(p.project_type)) {
+        for (const fl of g.fields) {
+          if (fl.default && (a[fl.key] === undefined || a[fl.key] === '')) a[fl.key] = fl.default;
+        }
+      }
+      setAnalysis(a);
       if (p.status === 'generating') startPolling();
     }).catch((e) => setError(e.message));
   }
@@ -73,6 +57,14 @@ export default function ProjectDetail() {
 
   function markDirty() { dirtyRef.current = true; setSaveState('dirty'); }
   const setField = (key, val) => { setAnalysis((a) => ({ ...a, [key]: val })); markDirty(); };
+  const toggleCheck = (key, option) => {
+    setAnalysis((a) => {
+      const cur = Array.isArray(a[key]) ? a[key] : [];
+      const next = cur.includes(option) ? cur.filter((x) => x !== option) : [...cur, option];
+      return { ...a, [key]: next };
+    });
+    markDirty();
+  };
 
   async function saveNow() {
     setSaveState('saving'); setError('');
@@ -85,10 +77,10 @@ export default function ProjectDetail() {
   }
   const onBlurCapture = () => { if (dirtyRef.current) saveNow(); };
 
-  async function onUpload(e) {
+  async function onUpload(e, kind = 'support') {
     const files = e.target.files;
     if (!files?.length) return;
-    await api.uploadFiles(id, files);
+    await api.uploadFiles(id, files, kind);
     e.target.value = '';
     load();
   }
@@ -112,11 +104,18 @@ export default function ProjectDetail() {
   const ptype = project.project_type;
   const tpl = templates.find((x) => x.id === ptype);
   const typeLabel = tpl ? (lang === 'tr' ? tpl.labelTr : tpl.labelEn) : ptype;
+  const questionCount = tpl?.questionCount || 13;
+  const groups = formFor(ptype);
 
-  const visible = FIELDS.filter(([, , , types]) => !types || types.includes(ptype));
+  const allFields = groups.flatMap((g) => g.fields);
+  const isFilled = (fl) => {
+    const v = analysis[fl.key];
+    if (Array.isArray(v)) return v.length > 0;
+    return (v || '').toString().trim().length > 0;
+  };
+  const filled = allFields.filter(isFilled).length;
+  const pct = Math.round((filled / allFields.length) * 100);
   const generating = project.status === 'generating';
-  const filled = visible.filter(([k]) => (analysis[k] || '').toString().trim()).length;
-  const pct = Math.round((filled / visible.length) * 100);
 
   return (
     <div className="page">
@@ -139,7 +138,7 @@ export default function ProjectDetail() {
       </div>
 
       {error && <div className="alert alert-err">{error}</div>}
-      {generating && <GenerationProgress progress={progress} t={t} lang={lang} />}
+      {generating && <GenerationProgress progress={progress} t={t} count={questionCount} />}
 
       {project.status === 'done' && project.doc_url && (
         <div className="alert alert-ok">
@@ -155,36 +154,45 @@ export default function ProjectDetail() {
 
           <div className="completeness">
             <div className="meter"><span style={{ width: `${pct}%` }} /></div>
-            <span>{t('detail.completeness', { done: filled, total: visible.length })}</span>
+            <span>{t('detail.completeness', { done: filled, total: allFields.length })}</span>
           </div>
 
           <div className="form">
-            {GROUPS.map((group) => {
-              const groupFields = visible.filter(([, , g]) => g === group);
-              if (groupFields.length === 0) return null;
-              return (
-                <div key={group}>
-                  <p className="group-label">{t(`detail.group.${group}`)}</p>
-                  {groupFields.map(([key, ftype]) => (
-                    <Field key={key} k={key} type={ftype} t={t} value={analysis[key]} onChange={setField} />
-                  ))}
-                </div>
-              );
-            })}
+            {groups.map((g, gi) => (
+              <div key={gi}>
+                <p className="group-label">{lang === 'tr' ? g.labelTr : g.labelEn}</p>
+                {g.fields.map((fl) => (
+                  <Field key={fl.key} fl={fl} lang={lang} value={analysis[fl.key]} onChange={setField} onToggle={toggleCheck} />
+                ))}
+              </div>
+            ))}
           </div>
         </section>
 
         <aside className="side">
           <section className="card">
+            <h2>{t('detail.files.wpTitle')}</h2>
+            <p className="muted">{t('detail.files.wpDesc')}</p>
+            <label className="upload upload-wp">
+              <input type="file" multiple accept=".docx,.doc,.txt,.md" onChange={(e) => onUpload(e, 'workpackages')} hidden />
+              <span>+ {t('detail.files.wpUpload')}</span>
+            </label>
+            <ul className="files">
+              {(project.files || []).filter((fl) => fl.kind === 'workpackages').map((fl) => <li key={fl.id}>📋 {fl.original_name}</li>)}
+              {!(project.files || []).some((fl) => fl.kind === 'workpackages') && <li className="muted tiny">{t('detail.files.wpEmpty')}</li>}
+            </ul>
+          </section>
+
+          <section className="card">
             <h2>{t('detail.files.title')}</h2>
             <p className="muted">{t('detail.files.desc')}</p>
             <label className="upload">
-              <input type="file" multiple onChange={onUpload} hidden />
+              <input type="file" multiple onChange={(e) => onUpload(e, 'support')} hidden />
               <span>+ {t('detail.files.upload')}</span>
             </label>
             <ul className="files">
-              {(project.files || []).map((f) => <li key={f.id}>📎 {f.original_name}</li>)}
-              {(!project.files || project.files.length === 0) && <li className="muted tiny">{t('detail.files.empty')}</li>}
+              {(project.files || []).filter((fl) => fl.kind !== 'workpackages').map((fl) => <li key={fl.id}>📎 {fl.original_name}</li>)}
+              {!(project.files || []).some((fl) => fl.kind !== 'workpackages') && <li className="muted tiny">{t('detail.files.empty')}</li>}
             </ul>
           </section>
 
@@ -213,25 +221,41 @@ export default function ProjectDetail() {
   );
 }
 
-function Field({ k, type, t, value, onChange }) {
+function Field({ fl, lang, value, onChange, onToggle }) {
+  const label = lang === 'tr' ? fl.tr : fl.en;
+  if (fl.type === 'checklist') {
+    const sel = Array.isArray(value) ? value : [];
+    return (
+      <div className="field">
+        <span>{label} <em className="muted tiny">({sel.length})</em></span>
+        <div className="checklist">
+          {fl.options.map((opt) => (
+            <label key={opt} className={`check-item ${sel.includes(opt) ? 'on' : ''}`}>
+              <input type="checkbox" checked={sel.includes(opt)} onChange={() => onToggle(fl.key, opt)} />
+              <span>{opt}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    );
+  }
   return (
     <label className="field">
-      <span>{t(`field.${k}.label`)}</span>
-      {type === 'textarea'
-        ? <textarea rows={3} value={value || ''} placeholder={t(`field.${k}.ph`)} onChange={(e) => onChange(k, e.target.value)} />
-        : <input value={value || ''} placeholder={t(`field.${k}.ph`)} onChange={(e) => onChange(k, e.target.value)} />}
+      <span>{label}</span>
+      {fl.type === 'textarea'
+        ? <textarea rows={3} value={value || ''} placeholder={fl.ph || ''} onChange={(e) => onChange(fl.key, e.target.value)} />
+        : <input value={value || ''} placeholder={fl.ph || ''} onChange={(e) => onChange(fl.key, e.target.value)} />}
     </label>
   );
 }
 
-function GenerationProgress({ progress, t, lang }) {
+function GenerationProgress({ progress, t, count }) {
   const step = progress?.step || 'start';
   const current = progress?.number || 0;
-  const titles = SECTION_TITLES[lang] || SECTION_TITLES.tr;
 
   let header = t('gen.start');
   if (step === 'context') header = t('gen.context');
-  else if (step === 'section') header = t('gen.section', { n: current });
+  else if (step === 'section') header = t('gen.sectionN', { n: current, total: count });
   else if (step === 'document') header = t('gen.document');
   else if (step === 'share') header = t('gen.share');
   else if (step === 'email') header = t('gen.email');
@@ -249,14 +273,14 @@ function GenerationProgress({ progress, t, lang }) {
         </div>
       </div>
       <div className="steps-grid">
-        {titles.map((title, i) => {
+        {Array.from({ length: count }, (_, i) => {
           const n = i + 1;
           const done = afterSections || n < current;
           const active = step === 'section' && n === current;
           return (
             <div key={n} className={`step${done ? ' done' : ''}${active ? ' active' : ''}`}>
               <span className="mark">{done ? '✓' : n}</span>
-              <span className="txt">{title}</span>
+              <span className="txt">{t('gen.sectionShort')} {n}</span>
             </div>
           );
         })}
