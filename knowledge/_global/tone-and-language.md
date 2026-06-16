@@ -11,4 +11,8 @@ description: Tüm bölümlerde geçerli yazım dili ve üslup kuralları
 - Her soru yalnızca o sorunun istediğini yanıtlasın; bölümler birbirini tekrar etmesin.
 - Yalnızca istenen metni döndür — bölüm başlığı veya soru numarası ekleme.
 
+**Fiil kipi (zaman/çatı) kuralı — tüm bölümlerde geçerli:** Konuya göre kimi yerde mevcut durumdan, kimi yerde gelecek plandan söz edilir; fiil çekimi buna göre seçilmelidir. Her zaman 3. tekil şahıs ve edilgen (resmi) çatı kullan; "yapar / ediyor" gibi 1. şahıs veya etken günlük dilden kaçın.
+- **Mevcut durum** anlatılırken (örn. firmanın bugünkü faaliyetleri, mevcut süreçler): geniş/şimdiki zaman edilgen kullan — "yapılmaktadır", "yürütülmektedir", "kullanılmaktadır", "gerçekleştirilmektedir".
+- **Gelecek plan, hedef, beklenen sonuç veya etki** anlatılırken (örn. proje hedefleri, proje sonuçları, beklenen etkiler): gelecek/öngörü kipi kullan — "yapılacaktır", "gerçekleştirilecektir", "beklenmektedir", "öngörülmektedir", "hedeflenmektedir".
+
 İlgili: [[evaluation-criteria]], [[formatting]]
