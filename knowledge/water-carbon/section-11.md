@@ -4,7 +4,7 @@ title: Beklenen Etki
 maxTokens: 2500
 ---
 
-Projenin şirket üzerindeki beklenen etkileri. En fazla **4 başlık**, her biri tek paragraf, toplam en fazla **500 kelime**; sonunda tüm etkileri sürdürülebilirlik yaklaşımıyla ilişkilendiren **3 cümlelik** özet paragrafı.
+Projenin şirket üzerindeki beklenen etkileri. En fazla **4 başlık**, her biri tek paragraf; sonunda tüm etkileri sürdürülebilirlik yaklaşımıyla ilişkilendiren **3 cümlelik** özet paragrafı.
 
 Olası başlıklar (gerekirse farklı/ek):
 - Kaynak Verimliliği ve Su Yönetimi Etkisi
