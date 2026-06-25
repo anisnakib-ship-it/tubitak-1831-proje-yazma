@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import fs from 'node:fs';
-import { PORT, GOOGLE, CHATGPT, ADMIN_PASSWORD } from './config.js';
+import path from 'node:path';
+import { PORT, BASE, ROOT_DIR, GOOGLE, CHATGPT, ADMIN_PASSWORD } from './config.js';
 import './db.js'; // şemayı başlat
 import { seedIfEmpty } from './services/knowledge.js';
 import projectsRouter from './routes/projects.js';
@@ -20,7 +21,7 @@ app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 
 // Sağlık / yapılandırma durumu
-app.get('/api/health', (req, res) => {
+app.get(`${BASE}/api/health`, (req, res) => {
   res.json({
     ok: true,
     engine: 'chatgpt-web',
@@ -30,16 +31,23 @@ app.get('/api/health', (req, res) => {
 });
 
 // Proje türleri (şablonlar) — veritabanından
-app.get('/api/templates', (req, res) => {
+app.get(`${BASE}/api/templates`, (req, res) => {
   res.json(getTemplates().map(({ id, labelTr, labelEn, descTr, descEn, months, workPackages }) =>
     ({ id, labelTr, labelEn, descTr, descEn, months, workPackages })));
 });
 
-app.use('/api/projects', projectsRouter);
-app.use('/api/projects', generateRouter);
-app.use('/api/knowledge', knowledgeRouter);
-app.use('/api/admin', adminRouter);
-app.use('/api/chatgpt', chatgptRouter);
+app.use(`${BASE}/api/projects`, projectsRouter);
+app.use(`${BASE}/api/projects`, generateRouter);
+app.use(`${BASE}/api/knowledge`, knowledgeRouter);
+app.use(`${BASE}/api/admin`, adminRouter);
+app.use(`${BASE}/api/chatgpt`, chatgptRouter);
+
+// Üretimde derlenmiş web arayüzünü sun
+const distPath = path.join(ROOT_DIR, 'web', 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(BASE, express.static(distPath));
+  app.get(`${BASE}/*`, (_req, res) => res.sendFile(path.join(distPath, 'index.html')));
+}
 
 app.use((err, req, res, next) => {
   console.error('Sunucu hatası:', err);
@@ -47,7 +55,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`\n  TÜBİTAK 1831 sunucusu çalışıyor: http://localhost:${PORT}`);
+  console.log(`\n  TÜBİTAK 1831 sunucusu çalışıyor: http://localhost:${PORT}${BASE}`);
   console.log(`  Motor: ChatGPT web (Playwright) — profil: ${fs.existsSync(CHATGPT.profileDir) ? 'var' : 'YOK (giriş gerekli)'}`);
   console.log(`  Google: ${GOOGLE.refreshToken ? 'hazır' : 'kurulmadı (npm run google:auth)'}`);
   console.log(`  Bilgi: veritabanı (Yönetim ekranından düzenlenir)`);
