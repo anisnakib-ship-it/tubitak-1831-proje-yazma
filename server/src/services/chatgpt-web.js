@@ -36,7 +36,15 @@ async function getContext() {
       args: ['--disable-blink-features=AutomationControlled']
     };
     if (CHATGPT.channel) opts.channel = CHATGPT.channel;
-    contextPromise = chromium.launchPersistentContext(CHATGPT.profileDir, opts);
+    contextPromise = chromium.launchPersistentContext(CHATGPT.profileDir, opts).then(async (ctx) => {
+      // Pano ile yapıştırma izinleri (prompt bütünlüğü için kullanılır — bkz. fillComposer)
+      try {
+        await ctx.grantPermissions(['clipboard-read', 'clipboard-write'], {
+          origin: new URL(CHATGPT.baseUrl).origin
+        });
+      } catch { /* yok say */ }
+      return ctx;
+    });
   }
   return contextPromise;
 }
@@ -101,11 +109,60 @@ export async function checkSession() {
   });
 }
 
-/** Compositöre metin yazar ve gönderir. */
-async function sendMessage(page, text) {
+// Karşılaştırma imzası: harf+rakam dışındaki her şeyi (boşluk, satır sonu,
+// markdown işaretleri) atar. Böylece prompt'un TAMAMININ kompozitöre ulaşıp
+// ulaşmadığı (eksik/kesik gönderim) güvenilir biçimde doğrulanır; satır sonu
+// gösterimi veya markdown işaret farkları yanlış hataya yol açmaz.
+const sigForCompare = (s) => String(s).toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+
+/**
+ * Metni ChatGPT kompozitörüne (ProseMirror contenteditable) güvenilir biçimde yazar.
+ *
+ * NEDEN: `locator.fill()` çok satırlı içerikte satır sonlarını düşüreb, içeriği
+ * eksik bırakabiliyordu → ChatGPT'ye bilgi tabanındakinden FARKLI bir prompt
+ * gidiyordu. Burada önce pano ile yapıştırılır (yapı korunur), doğrulanır;
+ * olmazsa satır satır yazılır. İçeriğin tamamı ulaşmazsa hata fırlatılır,
+ * böylece sessizce eksik prompt gönderilmez.
+ */
+async function fillComposer(page, text) {
   const composer = page.locator(SEL.composer);
-  await composer.click();
-  await composer.fill(text);
+  const expected = sigForCompare(text);
+  const verify = async () =>
+    sigForCompare(await composer.innerText().catch(() => '')) === expected;
+
+  const clearComposer = async () => {
+    await composer.click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.press('Delete');
+  };
+
+  // 1) Pano ile yapıştır — ProseMirror satır sonlarını/yapıyı korur,
+  //    yazma kurallarını (input rules) tetiklemez.
+  try {
+    await clearComposer();
+    await page.evaluate((t) => navigator.clipboard.writeText(t), text);
+    await composer.click();
+    await page.keyboard.press('Control+V');
+    await sleep(250);
+    if (await verify()) return;
+  } catch { /* yedek yönteme geç */ }
+
+  // 2) Yedek: satır satır yaz (satır araları Shift+Enter ile korunur)
+  await clearComposer();
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (i > 0) await page.keyboard.press('Shift+Enter');
+    if (lines[i]) await page.keyboard.type(lines[i]);
+  }
+  await sleep(250);
+  if (await verify()) return;
+
+  throw new Error('ChatGPT kompozitörüne prompt eksiksiz yazılamadı (bütünlük doğrulanamadı). Arayüz değişmiş olabilir.');
+}
+
+/** Compositöre metni güvenilir biçimde yazar ve gönderir. */
+async function sendMessage(page, text) {
+  await fillComposer(page, text);
   await sleep(150);
   // Gönder düğmesi ya da Enter
   const send = page.locator(SEL.sendButton);

@@ -62,6 +62,13 @@ try {
   }
 } catch { /* yok say */ }
 
+// Migration: eski (emekliye ayrılan) program türlerini geçerli 4 programa eşle.
+// tubitak-1831 (21 soruluk genel) kaldırıldı; su-blue → su-efficiency oldu.
+try {
+  db.exec(`UPDATE projects SET project_type = 'corporate-carbon' WHERE project_type IN ('tubitak-1831')`);
+  db.exec(`UPDATE projects SET project_type = 'water-efficiency'  WHERE project_type IN ('water-blue', 'water-blue-cert')`);
+} catch { /* yok say */ }
+
 export default db;
 
 // ---------------------------------------------------------

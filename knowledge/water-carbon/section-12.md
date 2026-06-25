@@ -6,7 +6,7 @@ maxTokens: 2500
 
 Projenin şirket dışına taşan, daha geniş ve uzun vadeli etkileri: sektör, ülke ve sürdürülebilirlik ekosistemi.
 
-- Başlıkları **numaralandır**; her biri tek paragraf, toplam en fazla **500 kelime**; ürün/makine detayı kullanma; beklenen etkiyi tekrar etme.
+- Başlıkları **numaralandır**; her biri tek paragraf; ürün/makine detayı kullanma; beklenen etkiyi tekrar etme.
 - Olası başlıklar (gerekirse farklı/ek):
   1. Sektörel Su Verimliliği ve Karbon Yönetimi Kültürüne Katkı
   2. Sanayide Ölçme, İzleme ve Raporlama Yaklaşımının Yaygınlaşması

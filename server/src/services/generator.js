@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { runConversation } from './chatgpt-web.js';
 import {
-  loadVault, parseIndex, getSectionNote, getScopeNote, getGlobalNotesText, getGuidelineForSection
+  loadVault, parseIndex, getSectionNote, getScopeNote, getGlobalNotesText, getGuidelineForSection,
+  getWorkPackageNote
 } from './knowledge.js';
 import { buildDocRequests } from './docbuilder.js';
 import { createDocument, clearDocument, applyRequests, shareDocument, docUrl } from './google.js';
@@ -23,6 +24,7 @@ const ANALYSIS_LABELS = {
   email: 'E-posta Adresi',
   foundingDate: 'Firma Kuruluş Tarihi',
   sectorNace: 'Sektör / NACE Kodu',
+  employees: 'Çalışan Sayısı',
   suppliers: 'Tedarikçiler',
   products: 'Ürünler ve Markalar',
   foundingStory: 'İşletmenin Kuruluş Hikâyesi',
@@ -52,12 +54,24 @@ const ANALYSIS_LABELS = {
   notes: 'Ek Notlar'
 };
 
+// "Hangi Alanlar?" bloğu — sayfada "değişmeden otomatik gelmeli" olarak işaretli;
+// kullanıcı seçmez, her projede sabit olarak eklenir (4 programda da aynı).
+const FIXED_WORK_AREAS = [
+  'KOBİ’lerin yeşil dönüşüme konusunda mevcut durumlarının belirlenmesi',
+  'Boşluk analizi yapılarak iyileşme sağlanması planlanan başlıkların belirlenmesi',
+  'Bu gereksinimlerin sağlanması için uygun çözümlerin geliştirilmesi',
+  'Bu çözümlerin hayata geçirilmesine yönelik yol haritalarının oluşturulması',
+  'Bu yol haritalarının uygulanmasında KOBİ’lere rehberlik yapılması'
+];
+
 function valToText(val) {
   if (Array.isArray(val)) return val.filter(Boolean).join(', ');
   return String(val).trim();
 }
 
 function formatAnalysis(analysis = {}) {
+  // Sabit "Hangi Alanlar?" bloğu kullanıcı girdisinin üzerine yazılır (değişmez).
+  analysis = { ...analysis, workAreas: FIXED_WORK_AREAS };
   const lines = ['ŞİRKET ANALİZ FORMU', ''];
   const seen = new Set();
   for (const [key, label] of Object.entries(ANALYSIS_LABELS)) {
@@ -97,6 +111,53 @@ function readUploadedFiles(files = []) {
     } catch { /* yok say */ }
   }
   return chunks.join('\n\n');
+}
+
+/**
+ * Bölüm uzunlukları — TEK kaynak: Google Sheet "CONTENT LENGTS" sekmesi.
+ * Tüm 4 program AYNI 13 soruluk iskeleti paylaştığı için uzunluklar soru
+ * NUMARASINA göre aynıdır. Soru 7 (İş Planı) hariçtir: uzunluğu kendi iş
+ * paketi belgesi belirler, kelime/karakter sınırı uygulanmaz.
+ */
+const SECTION_LENGTHS = {
+  1: { chars: 1500 },
+  2: { words: 1000 },
+  3: { words: 1500 },
+  4: { words: 1500 },
+  5: { words: 1500 },
+  6: { words: 2000 },
+  7: null, // İş Planı — sınır yok
+  8: { words: 750 },
+  9: { words: 500 },
+  10: { words: 750 },
+  11: { words: 1500 },
+  12: { words: 1500 },
+  13: { words: 1000 }
+};
+
+/**
+ * Bölüm uzunluk kuralını (KESİN) üretir. Kaynak yukarıdaki SECTION_LENGTHS
+ * (Sheet); istenirse section notunun frontmatter'ındaki `maxChars`/`targetWords`
+ * bunu geçersiz kılabilir. Komut/kılavuz metnindeki diğer uzunluk ifadeleri
+ * ("en az X kelime" vb.) KASTEN yok sayılır; bu blok her sorunun SONUNA eklenir
+ * ki son ve bağlayıcı talimat bu olsun.
+ */
+function lengthInstruction(note, number) {
+  const data = note?.data || {};
+  const fmChars = parseInt(data.maxChars, 10);
+  const fmWords = parseInt(data.targetWords, 10);
+  const sheet = SECTION_LENGTHS[number] || null;
+
+  const chars = Number.isFinite(fmChars) ? fmChars : sheet?.chars;
+  const words = Number.isFinite(fmWords) ? fmWords : sheet?.words;
+
+  if (Number.isFinite(chars)) {
+    return `\n\n=== UZUNLUK KURALI (KESİN) ===\nBu bölüm, boşluklar dâhil EN FAZLA ${chars} karakter olmalıdır. Metindeki/kılavuzdaki diğer tüm uzunluk ifadelerini (kelime/karakter sınırı, "en az", "en fazla", "yaklaşık" vb.) YOK SAY; yalnızca bu kurala uy.`;
+  }
+  if (Number.isFinite(words)) {
+    return `\n\n=== UZUNLUK KURALI (KESİN) ===\nBu bölüm YAKLAŞIK ${words} kelime olmalıdır (±%10). Metindeki/kılavuzdaki diğer tüm uzunluk ifadelerini ("en az", "en fazla", "yaklaşık X kelime" vb.) YOK SAY; yalnızca bu kurala uy.`;
+  }
+  return '';
 }
 
 /**
@@ -153,14 +214,21 @@ Bu bağlamı okuduğunu kısaca onayla. Ardından soruları tek tek göndereceğ
       const wp = (analysis.workPackages || '').trim();
       const wtbd = (analysis.workToBeDone || '').trim();
       const wpDoc = (wpDocText || '').trim();
+      // Kullanıcı kendi iş paketini girmediyse programın varsayılan iş paketi notunu esas al
+      const wpNote = (getWorkPackageNote(vault, template.folder)?.body || '').trim();
       if (wp || wtbd || wpDoc) {
         prompt += `\n\n=== KULLANICININ GİRDİĞİ İŞ PAKETLERİ (ÖNCELİKLİ — BUNU ESAS AL) ===`;
         if (wtbd) prompt += `\nProje Kapsamında Yapılacak Çalışmalar:\n${wtbd}`;
         if (wp) prompt += `\nİş Paketleri Tablosu:\n${wp}`;
         if (wpDoc) prompt += `\nİş Paketleri Belgesi (yüklenen):\n${wpDoc}`;
         prompt += `\n\nÖNEMLİ: İş paketlerinin ADLARINI, SAYISINI ve ÇIKTI adlarını yukarıdaki bilgilerden AYNEN al. Kılavuzdaki örnek/varsayılan iş paketi adlarını ve çıktı adlarını KULLANMA. Sadece toplam program süresi sabittir (${template.months} ay); ayları bu süreyle uyumlu olacak şekilde yaz.`;
+      } else if (wpNote) {
+        prompt += `\n\n=== İŞ PAKETLERİ BELGESİ (ESAS AL) ===\n${wpNote}\n\nÖNEMLİ: İş paketlerini yukarıdaki belgeye dayanarak hazırla; yapıyı, paket sayısını ve çıktıları koru, sözcükleri aynen kopyalamadan firmaya/ürüne göre detaylandır. Toplam program süresi ${template.months} aydır.`;
       }
     }
+
+    // Uzunluk kuralı (Sheet kaynaklı) — her zaman EN SONA eklenir ki bağlayıcı son talimat olsun.
+    prompt += lengthInstruction(note, n);
 
     questions.push({ number: n, title, prompt });
   }

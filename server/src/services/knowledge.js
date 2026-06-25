@@ -24,8 +24,16 @@ function walkMarkdown(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     if (entry.name.startsWith('.')) continue;
     const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...walkMarkdown(full));
-    else if (entry.isFile() && entry.name.toLowerCase().endsWith('.md')) out.push(full);
+    let isDir = entry.isDirectory();
+    let isFile = entry.isFile();
+    // OneDrive vb. "yalnızca çevrimiçi" yer tutucu dosyalar reparse point olduğu
+    // için Dirent.isFile()/isDirectory() ikisi de false dönebilir; statSync ile
+    // (yer tutucuyu çözerek) doğru sınıflandır — aksi halde notlar sessizce atlanır.
+    if (!isDir && !isFile) {
+      try { const st = fs.statSync(full); isDir = st.isDirectory(); isFile = st.isFile(); } catch { /* yok say */ }
+    }
+    if (isDir) out.push(...walkMarkdown(full));
+    else if (isFile && entry.name.toLowerCase().endsWith('.md')) out.push(full);
   }
   return out;
 }
@@ -140,6 +148,15 @@ export function getSectionNote(vault, folder, n) {
   const padded = String(n).padStart(2, '0');
   const notes = vault.byFolder.get(folder) || [];
   return notes.find((x) => x.fileName.toLowerCase().startsWith(`section-${padded}`)) || null;
+}
+
+/**
+ * Bir programın iş paketi notu (work-package). İş Planı sorusunda (Soru 7),
+ * kullanıcı kendi iş paketini yüklemediyse varsayılan referans olarak eklenir.
+ */
+export function getWorkPackageNote(vault, folder) {
+  const notes = vault.byFolder.get(folder) || [];
+  return notes.find((x) => x.fileName.toLowerCase().startsWith('work-package')) || null;
 }
 
 /**

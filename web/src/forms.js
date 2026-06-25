@@ -1,14 +1,10 @@
-// Proje türüne göre analiz formu alanları.
+// Tüm programlar TEK ve ortak analiz formunu kullanır (Google Sheet "Analysis Form").
 // type: 'input' | 'textarea' | 'checklist'
 // checklist seçenekleri Türkçe resmi program terimleridir; seçilenler "EVET" listesi olur.
-
-const WORK_AREAS = [
-  'KOBİ’lerin yeşil dönüşüme konusunda mevcut durumlarının belirlenmesi',
-  'Boşluk analizi yapılarak iyileşme sağlanması planlanan başlıkların belirlenmesi',
-  'Bu gereksinimlerin sağlanması için uygun çözümlerin geliştirilmesi',
-  'Bu çözümlerin hayata geçirilmesine yönelik yol haritalarının oluşturulması',
-  'Bu yol haritalarının uygulanmasında KOBİ’lere rehberlik yapılması'
-];
+//
+// NOT: "Hangi Alanlar?" (Work Areas) bloğu sayfada "değişmeden otomatik gelmeli"
+// olarak işaretlidir; bu yüzden kullanıcı alanı DEĞİLDİR — sunucu tarafında
+// (generator.js) sabit blok olarak her projeye eklenir.
 
 const SCOPE_ITEMS = [
   'Mevcut Durum Analizi',
@@ -49,15 +45,16 @@ const DOCUMENTS = [
 
 const f = (key, type, tr, en, ph = '', extra = {}) => ({ key, type, tr, en, ph, ...extra });
 
-// ---- TÜBİTAK 1831 (Genel) — standart 30 alanlı form ----
-const TUBITAK_1831 = [
+// ---- ORTAK ANALİZ FORMU (Google Sheet "Analysis Form") — 4 programın tamamı ----
+const SHARED = [
   { labelTr: 'Firma Künyesi', labelEn: 'Company Profile', fields: [
     f('companyName', 'input', 'Firma Tam Adı', 'Company Full Name'),
     f('owners', 'input', 'Firma Sahibi ve Ortakları', 'Owner & Partners'),
     f('shares', 'input', 'Ortakların Hisse Oranları', 'Partner Share Ratios'),
-    f('taxNo', 'input', 'Vergi No', 'Tax No'),
+    f('taxNo', 'input', 'Vergi / MERSİS / Sanayi Sicil No', 'Tax / MERSIS / Industry Reg. No'),
     f('foundingDate', 'input', 'Kuruluş Tarihi', 'Founding Date'),
     f('sectorNace', 'input', 'Sektör / NACE Kodu', 'Sector / NACE Code'),
+    f('employees', 'input', 'Çalışan Sayısı', 'Employee Count'),
     f('address', 'textarea', 'Adres', 'Address'),
     f('locations', 'textarea', 'Faaliyet Lokasyonları, Birimleri ve Alan (m²)', 'Locations, Units & Area (m²)'),
   ]},
@@ -81,7 +78,6 @@ const TUBITAK_1831 = [
     f('personnel', 'textarea', 'Personel Sayıları (Ar-Ge/Üretim/Diğer; cinsiyet ve eğitim)', 'Personnel (R&D/Production/Other; gender & education)'),
   ]},
   { labelTr: 'Proje Seçimleri', labelEn: 'Project Selections', fields: [
-    f('workAreas', 'checklist', 'Hangi Alanlarda Proje Yürütülecek?', 'Which Work Areas?', '', { options: WORK_AREAS }),
     f('projectScopeItems', 'checklist', 'Projenin Kapsamı (uygulanacak başlıklar)', 'Project Scope (applicable items)', '', { options: SCOPE_ITEMS }),
     f('needReasons', 'checklist', 'Projeye İhtiyaç Gerekçeleri / Problem Tanımı', 'Reasons for the Project / Problem Definition', '', { options: NEED_REASONS }),
     f('documents', 'checklist', 'Mevcut Belgeler', 'Existing Documents', '', { options: DOCUMENTS }),
@@ -90,62 +86,19 @@ const TUBITAK_1831 = [
     f('mentor', 'input', 'Mentor Kuruluş / Kişi', 'Mentor', '', { default: 'Prof. Dr. Ece Ümmü Deveci' }),
     f('expectedResults', 'textarea', 'Program Kapsamında Beklenen Sonuçlar', 'Expected Results'),
     f('workToBeDone', 'textarea', 'Proje Kapsamında Yapılacak Çalışmalar', 'Work to Be Done'),
-    f('workPackages', 'textarea', 'İş Paketleri (Tablo)', 'Work Packages (Table)', 'İş Paketi 1 - Ay 1 - ... -> Çıktı: ...'),
+    f('workPackages', 'textarea', 'İş Paketleri (opsiyonel — boşsa programın varsayılan iş paketi kullanılır)', 'Work Packages (optional — defaults to program template)', 'İş Paketi 1 - Ay 1 - ... -> Çıktı: ...'),
     f('projectName', 'input', 'Projenin Adı', 'Project Name'),
     f('notes', 'textarea', 'Ek Notlar', 'Additional Notes'),
   ]},
 ];
 
-// ---- Su Verimliliği / Mavi Sertifika ----
-const WATER = [
-  { labelTr: 'Firma Künyesi', labelEn: 'Company Profile', fields: [
-    f('companyName', 'input', 'İşletmenin Adı', 'Company Name'),
-    f('foundingDate', 'input', 'Kuruluş Tarihi', 'Founding Date'),
-    f('sectorNace', 'input', 'Sektör / NACE Kodu', 'Sector / NACE Code'),
-    f('taxNo', 'input', 'Vergi / MERSİS / Sanayi Sicil No', 'Tax / MERSIS / Industry Reg. No'),
-    f('address', 'textarea', 'Adres ve Lokasyon (OSB/Endüstri Bölgesi vb.)', 'Address & Location'),
-    f('employees', 'input', 'Çalışan Sayısı', 'Employee Count'),
-    f('products', 'textarea', 'Üretilen Ürünler ve NACE Üretim Miktarları', 'Products & Production Volumes'),
-  ]},
-  { labelTr: 'Su ve Atıksu Verileri', labelEn: 'Water & Wastewater Data', fields: [
-    f('waterSources', 'textarea', 'Su Kaynakları ve Kullanım Durumu (YAS, YÜS, şebeke, yağmur, gri su…)', 'Water Sources'),
-    f('waterWithdrawal', 'textarea', 'Yıllık Su Çekim ve Tüketim Miktarları (m³/yıl; endüstriyel/evsel/diğer)', 'Annual Withdrawal & Consumption'),
-    f('wastewater', 'textarea', 'Atıksu Miktarları, Karakterizasyonu, Arıtma ve Geri Kazanım', 'Wastewater, Treatment & Recovery'),
-    f('rainGreyWater', 'textarea', 'Yağmur Suyu Hasadı / Gri Su / Geleneksel Olmayan Kaynaklar', 'Rainwater / Greywater / Non-conventional'),
-    f('landscape', 'textarea', 'Peyzaj/Yeşil Alan ve Sulama Bilgileri (m², kaynak, yöntem)', 'Landscape & Irrigation'),
-  ]},
-  { labelTr: 'Mevcut Durum ve Belgeler', labelEn: 'Current State & Certificates', fields: [
-    f('waterRegulationStatus', 'input', 'Su Verimliliği Yönetmeliği Kapsamı (Zorunlu/Gönüllü)', 'Water Regulation Scope'),
-    f('certificates', 'textarea', 'Belgeler (ISO 14001 / 46001 / 14046, geçerlilik tarihleri)', 'Certificates'),
-    f('waterTechniques', 'textarea', 'Uygulanan Su Verimliliği Teknikleri ve Endüstriyel Simbiyoz', 'Applied Water-Efficiency Techniques'),
-    f('waterTraining', 'textarea', 'Su Verimliliği Eğitim ve Farkındalık Çalışmaları', 'Training & Awareness'),
-    f('projection', 'textarea', '5 Yıllık Büyüme ve Su İhtiyacı Projeksiyonları', '5-Year Growth & Water Projection'),
-  ]},
-  { labelTr: 'Ekip, Hedefler ve İş Paketleri', labelEn: 'Team, Targets & Work Packages', fields: [
-    f('waterTeam', 'textarea', 'Su Verimliliği Ekibi (lider, eğitim sorumlusu, yardımcı personel)', 'Water-Efficiency Team'),
-    f('waterTargets', 'textarea', 'Su Verimliliği Hedefleri (performans + süreç; 5 yıllık)', 'Water-Efficiency Targets'),
-    f('workToBeDone', 'textarea', 'Proje Kapsamında Yapılacak Çalışmalar', 'Work to Be Done'),
-    f('workPackages', 'textarea', 'İş Paketleri (Tablo)', 'Work Packages (Table)', 'İş Paketi 1 - Ay 1 - ... -> Çıktı: ...'),
-    f('notes', 'textarea', 'Ek Notlar', 'Additional Notes'),
-  ]},
-];
-
-// ---- Su Verimliliği + Kurumsal Karbon (birleşik) = su formu + karbon faaliyet verileri ----
-const WATER_CARBON = [
-  ...WATER.slice(0, 3),
-  { labelTr: 'Kurumsal Karbon Bileşeni', labelEn: 'Corporate Carbon Component', fields: [
-    f('carbonActivityData', 'textarea', '2025 Faaliyet Verileri (elektrik, yakıt, hammadde, atık, lojistik, hizmet alımı)', '2025 Activity Data'),
-    f('carbonScopes', 'textarea', 'Kapsam 1/2/3 Emisyon Kaynakları ve Mevcut Veri Durumu', 'Scope 1/2/3 Sources & Data Status'),
-  ]},
-  ...WATER.slice(3),
-];
-
 export const FORMS = {
-  'tubitak-1831': TUBITAK_1831,
-  'water-blue': WATER,
-  'water-carbon': WATER_CARBON
+  'corporate-carbon': SHARED,
+  'product-carbon': SHARED,
+  'water-efficiency': SHARED,
+  'water-carbon': SHARED
 };
 
 export function formFor(typeId) {
-  return FORMS[typeId] || TUBITAK_1831;
+  return FORMS[typeId] || SHARED;
 }
