@@ -1,203 +1,240 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { VAULT_PATH } from '../config.js';
-import { TEMPLATES, getTemplate } from '../templates.js';
+import { randomUUID } from 'node:crypto';
+import db from '../db.js';
+import { SERVER_DIR } from '../config.js';
 
 /**
- * Çok-türlü Obsidian bilgi grafiği okuyucusu.
+ * Bilgi (knowledge) katmanı — ARTIK VERİTABANI DESTEKLİ.
  *
- * Yapı:
- *   knowledge/_global/            → tüm türlerde otomatik kullanılan ortak notlar
- *   knowledge/<tür-klasörü>/      → her proje türünün intro + 13 bölüm notu
- *       00-index.md               → o türün 13 sorusunu notlara eşler
+ * Eskiden `knowledge/` Obsidian vault'undan okunuyordu; tüm prompt belgeleri,
+ * program kapsamları, iş paketleri, ortak kurallar ve bölüm uzunlukları artık
+ * SQLite'ta (`programs`, `program_sections`, `global_rules`) yaşar ve platform
+ * içindeki Yönetim ekranından düzenlenir. (En son kazanır; geçmiş tutulmaz.)
  *
- * Üretimde her bölüm için: _global notları + o türün index'inde o bölüme
- * bağlanan notlar prompt'a enjekte edilir.
+ * İlk açılışta tablolar boşsa `server/knowledge-seed.json` dosyasından tohumlanır.
  */
 
-const WIKILINK_RE = /\[\[([^\]|#]+?)(?:[#|][^\]]*)?\]\]/g;
-const GLOBAL_FOLDER = '_global';
+const SEED_PATH = path.join(SERVER_DIR, 'knowledge-seed.json');
 
-function walkMarkdown(dir) {
-  const out = [];
-  if (!fs.existsSync(dir)) return out;
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name.startsWith('.')) continue;
-    const full = path.join(dir, entry.name);
-    let isDir = entry.isDirectory();
-    let isFile = entry.isFile();
-    // OneDrive vb. "yalnızca çevrimiçi" yer tutucu dosyalar reparse point olduğu
-    // için Dirent.isFile()/isDirectory() ikisi de false dönebilir; statSync ile
-    // (yer tutucuyu çözerek) doğru sınıflandır — aksi halde notlar sessizce atlanır.
-    if (!isDir && !isFile) {
-      try { const st = fs.statSync(full); isDir = st.isDirectory(); isFile = st.isFile(); } catch { /* yok say */ }
+// ---------------------------------------------------------------------------
+// Okuma (üretim akışı — generator.js bunları kullanır)
+// ---------------------------------------------------------------------------
+
+export function getProgramBySlug(slug) {
+  return db.prepare(`SELECT * FROM programs WHERE slug = ?`).get(slug) || null;
+}
+
+export function listSections(programId) {
+  return db
+    .prepare(`SELECT * FROM program_sections WHERE program_id = ? ORDER BY number ASC`)
+    .all(programId);
+}
+
+export function getSection(programId, number) {
+  return db
+    .prepare(`SELECT * FROM program_sections WHERE program_id = ? AND number = ?`)
+    .get(programId, number) || null;
+}
+
+/** Ortak kuralların (eski _global) birleşik metni — intro mesajına eklenir. */
+export function getGlobalRulesText() {
+  const rows = db.prepare(`SELECT title, body FROM global_rules ORDER BY sort ASC`).all();
+  return rows.map((r) => `### ${r.title}\n${r.body || ''}`).join('\n\n');
+}
+
+// ---------------------------------------------------------------------------
+// CRUD (Yönetim ekranı — routes/admin.js)
+// ---------------------------------------------------------------------------
+
+export const Knowledge = {
+  listPrograms() {
+    return db.prepare(`SELECT * FROM programs ORDER BY sort ASC, label_tr ASC`).all();
+  },
+
+  getProgram(id) {
+    const program = db.prepare(`SELECT * FROM programs WHERE id = ?`).get(id);
+    if (!program) return null;
+    return { ...program, sections: listSections(id) };
+  },
+
+  updateProgram(id, fields) {
+    const allowed = ['label_tr', 'label_en', 'desc_tr', 'desc_en', 'months',
+      'work_packages', 'question_count', 'scope_text', 'wp_body', 'sort', 'active'];
+    const sets = [];
+    const values = [];
+    for (const [k, v] of Object.entries(fields)) {
+      if (!allowed.includes(k)) continue;
+      sets.push(`${k} = ?`);
+      values.push(v);
     }
-    if (isDir) out.push(...walkMarkdown(full));
-    else if (isFile && entry.name.toLowerCase().endsWith('.md')) out.push(full);
-  }
-  return out;
-}
+    if (sets.length === 0) return this.getProgram(id);
+    values.push(id);
+    db.prepare(`UPDATE programs SET ${sets.join(', ')} WHERE id = ?`).run(...values);
+    return this.getProgram(id);
+  },
 
-function parseFrontmatter(raw) {
-  const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
-  if (!match) return { data: {}, body: raw };
-  const data = {};
-  for (const line of match[1].split('\n')) {
-    const m = line.match(/^\s*([A-Za-z0-9_-]+)\s*:\s*(.*)\s*$/);
-    if (m) data[m[1].trim()] = m[2].trim();
-  }
-  return { data, body: raw.slice(match[0].length) };
-}
-
-const baseName = (file) => path.basename(file, path.extname(file));
-const normKey = (s) => String(s).trim().toLowerCase();
-
-/** Bir dosyanın VAULT_PATH altındaki ilk klasör segmentini döndürür. */
-function topFolder(file) {
-  const rel = path.relative(VAULT_PATH, file);
-  const parts = rel.split(path.sep);
-  return parts.length > 1 ? parts[0] : '';
-}
-
-/** Tüm vault'u belleğe yükler. */
-export function loadVault() {
-  const files = walkMarkdown(VAULT_PATH);
-  const notes = new Map();          // key -> note
-  const byFolder = new Map();       // folder -> note[]
-
-  for (const file of files) {
-    const raw = fs.readFileSync(file, 'utf8');
-    const { data, body } = parseFrontmatter(raw);
-    const bn = baseName(file);
-    const folder = topFolder(file);
-    const note = {
-      name: data.name || bn, fileName: bn, folder,
-      title: data.title || bn, description: data.description || '',
-      data, body: body.trim(), file
-    };
-    notes.set(normKey(bn), note);
-    if (data.name) notes.set(normKey(data.name), note);
-    if (!byFolder.has(folder)) byFolder.set(folder, []);
-    byFolder.get(folder).push(note);
-  }
-
-  return { notes, byFolder, vaultPath: VAULT_PATH, count: files.length };
-}
-
-function extractLinks(text) {
-  const links = [];
-  let m;
-  WIKILINK_RE.lastIndex = 0;
-  while ((m = WIKILINK_RE.exec(text)) !== null) links.push(m[1].trim());
-  return links;
-}
-
-/** Bir türün index notunu bulur (klasöründe adı 'index' içeren not). */
-function findIndexNote(vault, folder) {
-  const notes = vault.byFolder.get(folder) || [];
-  return notes.find((n) => n.fileName.toLowerCase().includes('index')) || null;
-}
-
-/** _global klasöründeki tüm notların adları (her bölüme uygulanır). */
-function globalNoteNames(vault) {
-  return (vault.byFolder.get(GLOBAL_FOLDER) || []).map((n) => n.name);
-}
-
-/**
- * Bir türün index notunu ayrıştırır: Soru N → [not adları].
- */
-export function parseIndex(vault, folder) {
-  const perSection = new Map();
-  const indexNote = findIndexNote(vault, folder);
-  if (!indexNote) return { perSection, global: globalNoteNames(vault), indexNote: null };
-
-  let current = null;
-  for (const line of indexNote.body.split('\n')) {
-    const heading = line.match(/^#{1,6}\s+(.*)$/);
-    if (heading) {
-      const num = normKey(heading[1]).match(/(?:soru|q|bölüm|bolum)\s*0*(\d{1,2})/);
-      current = num ? parseInt(num[1], 10) : null;
+  updateSection(sectionId, fields) {
+    const allowed = ['title', 'prompt_body', 'max_chars', 'target_words'];
+    const sets = [];
+    const values = [];
+    for (const [k, v] of Object.entries(fields)) {
+      if (!allowed.includes(k)) continue;
+      sets.push(`${k} = ?`);
+      values.push(v === '' ? null : v);
     }
-    const inlineNum = line.match(/(?:soru|q|bölüm|bolum)\s*0*(\d{1,2})/i);
-    const links = extractLinks(line);
-    if (links.length === 0) continue;
-    const target = inlineNum ? parseInt(inlineNum[1], 10) : current;
-    if (target == null) continue;
-    if (!perSection.has(target)) perSection.set(target, []);
-    const arr = perSection.get(target);
-    for (const l of links) if (!arr.includes(l)) arr.push(l);
-  }
+    if (sets.length === 0) return null;
+    values.push(sectionId);
+    db.prepare(`UPDATE program_sections SET ${sets.join(', ')} WHERE id = ?`).run(...values);
+    return db.prepare(`SELECT * FROM program_sections WHERE id = ?`).get(sectionId);
+  },
 
-  return { perSection, global: globalNoteNames(vault), indexNote };
-}
+  listGlobalRules() {
+    return db.prepare(`SELECT * FROM global_rules ORDER BY sort ASC`).all();
+  },
 
-/** _global klasöründeki notların birleşik metni (intro mesajına eklenir). */
-export function getGlobalNotesText(vault) {
-  const notes = vault.byFolder.get(GLOBAL_FOLDER) || [];
-  return notes.map((n) => `### ${n.title}\n${n.body}`).join('\n\n');
-}
+  createGlobalRule({ title, body = '', sort = 0 }) {
+    const id = randomUUID();
+    db.prepare(`INSERT INTO global_rules (id, title, body, sort) VALUES (?, ?, ?, ?)`)
+      .run(id, title, body, sort);
+    return db.prepare(`SELECT * FROM global_rules WHERE id = ?`).get(id);
+  },
 
-/** Bir türün kapsam/scope notu (sistem promptuna eklenir). */
-export function getScopeNote(vault, folder) {
-  const notes = vault.byFolder.get(folder) || [];
-  return notes.find((x) => x.fileName.toLowerCase() === 'scope') || null;
-}
-
-/** Bir türün belirli bölümünün birincil notu (section-NN). */
-export function getSectionNote(vault, folder, n) {
-  const padded = String(n).padStart(2, '0');
-  const notes = vault.byFolder.get(folder) || [];
-  return notes.find((x) => x.fileName.toLowerCase().startsWith(`section-${padded}`)) || null;
-}
-
-/**
- * Bir programın iş paketi notu (work-package). İş Planı sorusunda (Soru 7),
- * kullanıcı kendi iş paketini yüklemediyse varsayılan referans olarak eklenir.
- */
-export function getWorkPackageNote(vault, folder) {
-  const notes = vault.byFolder.get(folder) || [];
-  return notes.find((x) => x.fileName.toLowerCase().startsWith('work-package')) || null;
-}
-
-/**
- * Bir bölüm için kılavuz metnini derler (global notlar + bölüme bağlı notlar).
- * @param {object} [opts]
- * @param {boolean} [opts.includeGlobal=true] _global notları da dahil et.
- *   Üretimde intro mesajı global notları zaten taşıdığı için false geçilir.
- */
-export function getGuidelineForSection(vault, index, n, { includeGlobal = true } = {}) {
-  const wanted = [...(includeGlobal ? index.global : []), ...(index.perSection.get(n) || [])];
-  const seen = new Set();
-  const chunks = [];
-  for (const link of wanted) {
-    const key = normKey(link);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const note = vault.notes.get(key);
-    if (!note) { chunks.push(`> [Uyarı] Kılavuz notu bulunamadı: [[${link}]]`); continue; }
-    chunks.push(`### ${note.title}\n${note.body}`);
-  }
-  return chunks.join('\n\n');
-}
-
-/** Tüm türler için sağlık kontrolü. */
-export function vaultHealth() {
-  const vault = loadVault();
-  const types = TEMPLATES.map((tpl) => {
-    const index = parseIndex(vault, tpl.folder);
-    const sections = [];
-    const count = tpl.questionCount || 13;
-    for (let n = 1; n <= count; n++) {
-      const g = getGuidelineForSection(vault, index, n);
-      sections.push({ section: n, ok: g.trim().length > 0, chars: g.length });
+  updateGlobalRule(id, fields) {
+    const allowed = ['title', 'body', 'sort'];
+    const sets = [];
+    const values = [];
+    for (const [k, v] of Object.entries(fields)) {
+      if (!allowed.includes(k)) continue;
+      sets.push(`${k} = ?`);
+      values.push(v);
     }
+    if (sets.length === 0) return db.prepare(`SELECT * FROM global_rules WHERE id = ?`).get(id);
+    values.push(id);
+    db.prepare(`UPDATE global_rules SET ${sets.join(', ')} WHERE id = ?`).run(...values);
+    return db.prepare(`SELECT * FROM global_rules WHERE id = ?`).get(id);
+  },
+
+  deleteGlobalRule(id) {
+    db.prepare(`DELETE FROM global_rules WHERE id = ?`).run(id);
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Dışa / İçe aktar (Export / Import JSON) — tohum biçimiyle aynı
+// ---------------------------------------------------------------------------
+
+export function exportKnowledge() {
+  const programs = Knowledge.listPrograms().map((p) => ({
+    slug: p.slug,
+    label_tr: p.label_tr,
+    label_en: p.label_en,
+    desc_tr: p.desc_tr,
+    desc_en: p.desc_en,
+    months: p.months,
+    work_packages: p.work_packages,
+    question_count: p.question_count,
+    scope_text: p.scope_text || '',
+    sort: p.sort,
+    active: p.active,
+    work_package_body: p.wp_body || '',
+    sections: listSections(p.id).map((s) => ({
+      number: s.number,
+      title: s.title,
+      prompt_body: s.prompt_body || '',
+      max_chars: s.max_chars,
+      target_words: s.target_words
+    }))
+  }));
+  const global_rules = Knowledge.listGlobalRules().map((r) => ({
+    title: r.title, body: r.body || '', sort: r.sort
+  }));
+  return { version: 1, exported_at: new Date().toISOString(), global_rules, programs };
+}
+
+/** Tüm bilgiyi verilen tohum/dışa-aktarım nesnesiyle DEĞİŞTİRİR (en son kazanır). */
+export function importKnowledge(data) {
+  if (!data || !Array.isArray(data.programs)) {
+    throw new Error('Geçersiz bilgi dosyası: "programs" dizisi bulunamadı.');
+  }
+  const insProgram = db.prepare(`
+    INSERT INTO programs (id, slug, label_tr, label_en, desc_tr, desc_en, months,
+      work_packages, question_count, scope_text, wp_body, sort, active)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+  const insSection = db.prepare(`
+    INSERT INTO program_sections (id, program_id, number, title, prompt_body, max_chars, target_words)
+    VALUES (?, ?, ?, ?, ?, ?, ?)`);
+  const insRule = db.prepare(`INSERT INTO global_rules (id, title, body, sort) VALUES (?, ?, ?, ?)`);
+
+  db.exec('BEGIN');
+  try {
+    db.exec('DELETE FROM program_sections');
+    db.exec('DELETE FROM programs');
+    db.exec('DELETE FROM global_rules');
+
+    for (const [pi, p] of data.programs.entries()) {
+      const programId = randomUUID();
+      insProgram.run(
+        programId, p.slug, p.label_tr, p.label_en ?? '', p.desc_tr ?? '', p.desc_en ?? '',
+        p.months ?? 6, p.work_packages ?? 4, p.question_count ?? 13,
+        p.scope_text ?? '', p.work_package_body ?? p.wp_body ?? '',
+        p.sort ?? pi, p.active ?? 1
+      );
+      for (const s of p.sections || []) {
+        insSection.run(
+          randomUUID(), programId, s.number, s.title ?? `Bölüm ${s.number}`,
+          s.prompt_body ?? '', s.max_chars ?? null, s.target_words ?? null
+        );
+      }
+    }
+    for (const [ri, r] of (data.global_rules || []).entries()) {
+      insRule.run(randomUUID(), r.title, r.body ?? '', r.sort ?? ri);
+    }
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  }
+}
+
+/** Tablolar boşsa tohum dosyasından doldur (ilk açılış / yeni sunucu). */
+export function seedIfEmpty() {
+  const count = db.prepare(`SELECT COUNT(*) AS n FROM programs`).get().n;
+  if (count > 0) return { seeded: false, programs: count };
+  if (!fs.existsSync(SEED_PATH)) {
+    console.warn(`  ⚠ Bilgi tohumu bulunamadı: ${SEED_PATH} — programlar boş.`);
+    return { seeded: false, programs: 0 };
+  }
+  const data = JSON.parse(fs.readFileSync(SEED_PATH, 'utf8'));
+  importKnowledge(data);
+  const n = db.prepare(`SELECT COUNT(*) AS n FROM programs`).get().n;
+  console.log(`  ✓ Bilgi tohumlandı: ${n} program (${SEED_PATH})`);
+  return { seeded: true, programs: n };
+}
+
+// ---------------------------------------------------------------------------
+// Sağlık kontrolü — /api/knowledge/health
+// ---------------------------------------------------------------------------
+
+export function knowledgeHealth() {
+  const programs = Knowledge.listPrograms();
+  const rules = Knowledge.listGlobalRules();
+  const types = programs.map((p) => {
+    const sections = listSections(p.id).map((s) => ({
+      section: s.number,
+      ok: !!(s.prompt_body && s.prompt_body.trim().length > 0),
+      chars: (s.prompt_body || '').length
+    }));
     return {
-      id: tpl.id, label: tpl.labelTr, folder: tpl.folder,
-      hasIndex: !!index.indexNote, mappedSections: sections.filter((s) => s.ok).length, sections
+      id: p.slug, label: p.label_tr,
+      hasScope: !!(p.scope_text && p.scope_text.trim()),
+      mappedSections: sections.filter((s) => s.ok).length,
+      sections
     };
   });
   return {
-    vaultPath: vault.vaultPath, noteCount: vault.count,
-    globalNotes: globalNoteNames(vault), types
+    source: 'database',
+    globalRules: rules.map((r) => r.title),
+    types
   };
 }

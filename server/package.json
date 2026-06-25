@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Backend: projects, Obsidian knowledge graph, Claude generation, Google Docs + Gmail",
+  "description": "Backend: projects, DB-backed knowledge (programs/prompts), ChatGPT generation, Google Docs + Gmail",
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",

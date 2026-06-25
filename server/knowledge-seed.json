@@ -1,0 +1,452 @@
+{
+  "version": 1,
+  "exported_at": "2026-06-25T12:02:46.967Z",
+  "global_rules": [
+    {
+      "title": "Değerlendirme Kriterleri",
+      "body": "Projeler dört boyutta değerlendirilir (her biri %25):\r\n1. **Program Uyumu** — Yeşil İnovasyon Teknoloji Mentörlüğü çerçevesiyle örtüşme\r\n2. **Uygulanabilirlik** — metodoloji ve iş planının gerçekçiliği\r\n3. **Etki Potansiyeli** — çıktıların çevresel, ekonomik ve teknolojik değeri\r\n4. **Ekip Yetkinliği** — KOBİ ve Çözüm Ortağının kapasitesi\r\n\r\nHer bölümü bu kriterlerden en az birini güçlendirecek şekilde yaz.\r\n\r\nİlgili: [[tone-and-language]]",
+      "sort": 0
+    },
+    {
+      "title": "Biçimlendirme Kuralları",
+      "body": "- Alt başlıkları `**Başlık**` biçiminde yaz. Madde gerektiğinde `-`, numaralı liste için `1.` kullan.\r\n- Başlıklarda \"Problem 1\", \"Çözüm 1\", \"Hedef 1\", \"Adım 1\", \"Yöntem 1\" gibi numaralı/şablon ifadeler kullanma; içeriği doğrudan başlık yap.\r\n- Paragraflar arasında tek boş satır bırak. Tablo kullanma (doküman oluşturucu tablo render etmez).\r\n- Bölüm başlığını veya soru numarasını tekrar yazma; doküman bunları otomatik ekler.\r\n\r\nİlgili: [[tone-and-language]]",
+      "sort": 1
+    },
+    {
+      "title": "TÜBİTAK 1831 Program Bilgileri",
+      "body": "Program Adı: TÜBİTAK 1831 Yeşil İnovasyon Teknoloji Mentörlüğü Programı\r\nYürüten Kurum: TÜBİTAK · Fonlayan: Dünya Bankası\r\nToplam Bütçe: 20 milyon USD · Hizmet alımı üst limiti: 280.000 TL\r\nProje Süresi: 6 ay · Destek oranı: %90 TÜBİTAK, %10 (+KDV) KOBİ tarafından ödenir.\r\n\r\nProgram kapsamında KOBİ'lere Çözüm Ortakları üzerinden şu hizmetler verilir:\r\n- KOBİ'lerin yeşil dönüşümdeki mevcut durumunun belirlenmesi\r\n- İhtiyaçları karşılayacak uygun çözümlerin geliştirilmesi\r\n- Bu çözümlerin uygulanması için yol haritalarının oluşturulması\r\n- Yol haritalarının uygulanmasında KOBİ'lere rehberlik edilmesi\r\n\r\nDeğerlendirme Kriterleri (her biri %25):\r\n1. Projenin program çerçevesiyle uyumu\r\n2. Projenin uygulanabilirliği (fizibilite)\r\n3. Projenin etki potansiyeli\r\n4. Proje ekibinin (KOBİ + Çözüm Ortağı) yetkinliği",
+      "sort": 2
+    },
+    {
+      "title": "Dil ve Üslup Kuralları",
+      "body": "- Çıktı dili: **Türkçe**. Resmi, akademik ve TÜBİTAK proje formuna uygun bir dil kullan.\r\n- Profesyonel, açık, teknik ve proje odaklı yaz. Ders kitabı tanımları, gereksiz genel bilgiler ve uzun mevzuat açıklamaları kullanma.\r\n- Promosyon/pazarlama dili, abartı ve doğrulanamayan iddialardan kaçın.\r\n- Yalnızca analiz formunda verilen bilgileri kullan. Formda olmayan sayısal veri, belge, kapasite, yatırım, makine, müşteri, sertifika veya ihracat bilgisi **uydurma**.\r\n- Her soru yalnızca o sorunun istediğini yanıtlasın; bölümler birbirini tekrar etmesin.\r\n- Yalnızca istenen metni döndür — bölüm başlığı veya soru numarası ekleme.\r\n\r\n**Fiil kipi (zaman/çatı) kuralı — tüm bölümlerde geçerli:** Konuya göre kimi yerde mevcut durumdan, kimi yerde gelecek plandan söz edilir; fiil çekimi buna göre seçilmelidir. Her zaman 3. tekil şahıs ve edilgen (resmi) çatı kullan; \"yapar / ediyor\" gibi 1. şahıs veya etken günlük dilden kaçın.\r\n- **Mevcut durum** anlatılırken (örn. firmanın bugünkü faaliyetleri, mevcut süreçler): geniş/şimdiki zaman edilgen kullan — \"yapılmaktadır\", \"yürütülmektedir\", \"kullanılmaktadır\", \"gerçekleştirilmektedir\".\r\n- **Gelecek plan, hedef, beklenen sonuç veya etki** anlatılırken (örn. proje hedefleri, proje sonuçları, beklenen etkiler): gelecek/öngörü kipi kullan — \"yapılacaktır\", \"gerçekleştirilecektir\", \"beklenmektedir\", \"öngörülmektedir\", \"hedeflenmektedir\".\r\n\r\nİlgili: [[evaluation-criteria]], [[formatting]]",
+      "sort": 3
+    }
+  ],
+  "programs": [
+    {
+      "slug": "corporate-carbon",
+      "label_tr": "Kurumsal Karbon Ayak İzi",
+      "label_en": "Corporate Carbon Footprint",
+      "desc_tr": "ISO 14064-1 kapsamında kurumsal karbon ayak izi hesaplama ve yeşil dönüşüm yol haritası",
+      "desc_en": "Corporate carbon footprint (ISO 14064-1) calculation and green transformation roadmap",
+      "months": 6,
+      "work_packages": 4,
+      "question_count": 13,
+      "scope_text": "Bu proje, bir şirket için **kurumsal karbon ayak izi hesaplama** projesidir; TÜBİTAK 1831 Yeşil İnovasyon Teknoloji Mentörlük Programı (Dünya Bankası destekli, yürütücü TÜBİTAK) kapsamında, **6 aylık** olarak yürütülür.\n\n**Bu bir ÜRÜN karbon ayak izi projesi DEĞİLDİR.** Ana standart **TS EN ISO 14064-1** kuruluş (organizasyon) düzeyindeki sera gazı envanteridir; hesaplamalar **GHG Protocol** kılavuzlarına dayanır.\n\nOdak: kurumsal sera gazı envanteri; **Kapsam 1 (doğrudan), Kapsam 2 (enerji dolaylı), Kapsam 3 (diğer dolaylı)** emisyon kaynakları; faaliyet verisi toplama; emisyon faktörü eşleştirme; kurumsal karbon ayak izi hesaplama ve raporlama (ISO 14064-1 uyumlu); yüksek emisyonlu alanların belirlenmesi ve **yeşil dönüşüm yol haritası**.\n\nGenel kurallar:\n- Yalnızca analiz formundaki bilgileri kullan; sayısal veri, kapasite, yatırım, makine, müşteri, sertifika UYDURMA. Bilgi yoksa varsayımda bulunma.\n- \"Biz\" dilini kullan (ör. \"[Firma adı] olarak…\", \"firmamız…\", \"bu projeyle…\").\n- Ders kitabı düzeyinde genel tanımlar, çok uzun mevzuat açıklamaları ve kapsam dışı konular yazma.\n- Ürün düzeyi karbon ayak izi / ISO 14067 ile karıştırma; kuruluş düzeyinde kal.\n- Tüm yanıtlar Türkçe ve ilgili soru başlığının amacına uygun olmalı.\n\nProgram teşvik bilgisi: hizmet bedelinin %90'ı TÜBİTAK tarafından Çözüm Ortağına ödenir; KOBİ %10 + KDV öder. Değerlendirme dört boyutta (%25'er): programa uygunluk, yapılabilirlik, etki potansiyeli, proje ekibi yetkinliği.",
+      "sort": 0,
+      "work_package_body": "Aşağıdaki iş paketi yapısını referans al; yapıyı ve çıktıları koru, sözcükleri aynen kopyalamadan firmanın ürünlerine ve süreçlerine göre paraflayarak detaylandır. Toplam süre: 6 ay. Veri toplama iş paketi (2.–3. ay) firmayla birlikte yürütülüp mentor tarafından gözden geçirilir.\n\n**İş Paketi 1 — 1. Ay — Proje Başlangıcı, Mevcut Durum Analizi ve Farkındalık Eğitimi**\n- Faaliyetler: Kurumsal karbon ayak izi çalışmasının sınırlarının belirlenmesi; kapsama dâhil edilecek üretim ve destek süreçlerine birlikte karar verilmesi (makineler, hammadde/yardımcı malzemeler, enerji, lojistik, atık yapısı vb. mevcut belgeler üzerinden değerlendirilmesi); düzenli izlenmeyen çevre/enerji veri boşluklarının tespiti; çalışanlara kurumsal karbon ayak izi eğitimi (ISO 14064-1 yaklaşımı, Kapsam 1/2/3 kaynakları, veri toplama/raporlama dikkat noktaları).\n- Çıktı: Emisyon Kaynakları ve Kurumsal Karbon Eğitim Belgeleri\n\n**İş Paketi 2 — 2.–3. Ay — Faaliyet Verilerinin Toplanması ve Kurumsal Envanterin Oluşturulması**\n- Faaliyetler: ISO 14064-1'e uygun şekilde faaliyet verilerinin firma–mentor ortak çalışma düzeniyle kademeli toplanması (yakıt/enerji tüketimi, elektrik, hammadde ve yardımcı malzeme alımları, hizmet alımları, üretim atıkları, lojistik); verilerin standart faaliyet veri envanterine dönüştürülmesi; eksik/tutarsız verilerin firmayla tamamlanması; Kapsam 1, 2 ve 3'ü kapsayan kurumsal sera gazı envanterinin oluşturulması.\n- Çıktı: Kurumsal Sera Gazı Envanteri\n\n**İş Paketi 3 — 4. Ay — Kurumsal Karbon Ayak İzi Hesaplamaları ve Raporlama**\n- Faaliyetler: Kapsam 1/2/3 emisyonlarının faaliyet veri envanteri kullanılarak GHG Protocol kılavuzlarına göre hesaplanması; uygun emisyon faktörlerinin tutarlı ve izlenebilir biçimde uygulanması; toplam kurumsal karbon ayak izi, kapsam bazlı dağılım ve yoğun alanların sayısal sunumu; bulguların ISO 14064-1 uyumlu rapora dönüştürülmesi.\n- Çıktı: Kurumsal Karbon Ayak İzi Raporu\n\n**İş Paketi 4 — 5.–6. Ay — Yeşil Dönüşüm Yol Haritasının Oluşturulması**\n- Faaliyetler: Hesaplama sonuçlarına dayalı firmaya özgü Yeşil Dönüşüm Yol Haritasının hazırlanması; sektöre uygun iyi uygulamaların değerlendirilmesi; tedarik zinciri, atık, su kullanımı vb. alanlarda boşluk analizi; kısa/orta/uzun vadeli teknik ve yönetsel adımlar, enerji verimliliği ve süreç iyileştirme, hammadde/atık azaltımı ve kaynak verimliliği başlıklarının yapılandırılması ve hedeflerin belirlenmesi.\n- Çıktı: Boşluk Analizi Sonuçları; Yeşil Dönüşüm Yol Haritası",
+      "sections": [
+        {
+          "number": 1,
+          "title": "Projenin Kısa Tanıtımı",
+          "prompt_body": "### Projenin Kısa Tanıtımı\nProjenin amacını doğrudan vurgula; bu amaca ulaşmak için yapılacak çalışmaları kısaca özetle ve projenin somut hedeflerini öne çıkar. Özet, projeyle ilgili çekirdek teknolojik alanlardaki uzmanlara sunulacağı için ders kitabı düzeyindeki genel kavramları tekrar etme; çalışılacak teknik ayrıntılara odaklan. Herhangi bir projeye uyabilecek genel proje yönetimi açıklamaları, iş paketi sıralaması gibi ifadeler ve projeye özgü olmayan firma geçmişi anlatma.\n\n- Başlık kullanma; akıcı paragraflar halinde, eksiksiz bilgi ver.\n- 4 paragraf olacak şekilde kurgula. Projenin tamamını özetle ve güçlü bir proje imajı sun. Son paragrafta firmanın faaliyetlerini, bu projeyi hangi amaçla yürüttüğünü ve proje sonunda elde edilecek olası kazanımları belirt.\n- Bu bölüm için gerekli bilgiyi analiz formunun \"Projeye İhtiyaç Gerekçeleri\" kısmından al; firmadan söz ederken adını analiz formundaki gibi kullan ve \"Ürünler ve Markalar\" kısmından kısaca ürün bilgisini ver.\n- \"Biz\" dilini kullan (\"[firma adı] olarak…\", \"firmamız…\").",
+          "max_chars": 1500,
+          "target_words": null
+        },
+        {
+          "number": 2,
+          "title": "Projenin Çağrı ile İlişkisi",
+          "prompt_body": "### Projenin Çağrı ile İlişkisi\nBu proje, Dünya Bankası destekli ve TÜBİTAK (KOSGEB iş birliğiyle) tarafından yürütülen 1831 Yeşil İnovasyon Teknoloji Mentörlük Programı kapsamındadır. Giriş paragrafında, firmanın kendisi için belirlediği kapsamların projenin amaçları doğrultusunda önemli bir adım olduğunu açıkla; firma adını belirt ve projeyi yürütme amacının çağrıyla ilişkili olduğunu söyleyen bir cümle ekle. Giriş paragrafı en az 5 cümle olsun.\n\nArdından aşağıdaki **3 başlığı aynı adlarla** kullan; her başlık altında, bu adımların somut yapılacak işleri anlatmadan çağrıyla nasıl örtüştüğünü açıkla (yapılacak işin kendisini değil, uyumu anlat):\n\n**Projenin Çağrı ile İlişkisi** (ana başlık)\n\n1. **Yeşil Dönüşüm ve Sürdürülebilirlik Amaçları** — programın neden ve kim tarafından yürütüldüğü, KOBİ'lere faydaları ve bu program kapsamında yapılacak çalışmaların projenin gereksinimlerini nasıl karşıladığı.\n2. **Teknik Danışmanlık ve Kapasite Artırımı** — hibe oranını belirt; bu yüksek hibe oranıyla firmanın ihtiyaç duyduğu teknik bilgiye nasıl erişebileceği.\n3. **Çözüm Yaklaşımları ve Yol Haritası Hazırlama** — bu başlık altındaki çalışmaların proje içindeki önemi ve gerekliliği; firmanın kendi yol haritasını hazırlamasının elzem olduğu.\n\nSonda, bu hedeflerle uyumlu bir proje önerisi olduğunu özetleyen birkaç cümlelik bir paragraf yaz.",
+          "max_chars": null,
+          "target_words": 1000
+        },
+        {
+          "number": 3,
+          "title": "Problem Tanımı",
+          "prompt_body": "### Problem Tanımı\nAnaliz formundaki \"Projeye İhtiyaç Gerekçeleri / Problem Tanımı\" kısmını esas al. Bu bölümde firmanın bu projeye neden ihtiyaç duyduğunu (problem tanımını) belirle ve her bir maddenin projeyi neden gerekli kıldığını ikna edici biçimde açıkla. Problem tanımı, firmanın bu projeyi neden yürütmesi gerektiğini anlatır; dolayısıyla yapılacak işi firma için bir ihtiyaç olarak ifade et. Firmanın daha önce bu çalışmayı yapmadığını ve bu nedenle kurumsal karbon ayak izini ölçecek verisinin bulunmadığını belirtebilirsin.\n\n- Her maddeyi en az 5–6 cümlelik paragraflar halinde açıkla; belirlenen problemlerin firma için neden ve nasıl gerekli olduğunu anlat.\n- Bu bölümde firmanın proje adı, ürünleri, kapasitesi, alanı veya özellikleri gibi bilgilere kesinlikle yer verme; yalnızca projenin neden yürütülmesi gerektiğine odaklan.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 4,
+          "title": "Çözüm Önerisi",
+          "prompt_body": "### Çözüm Önerisi\nÖnce tek paragraflık bir giriş yaz: \"proje kapsamında\" ve \"firma olarak\" hedeflere ulaşmak için planların olduğunu vurgula, yapılacak işi iki cümleyle özetle ve bu çalışmanın firmayı nasıl güçlendireceğine dair bir cümle ekle.\n\nÇözüm önerisinin ana mesajı: bir önceki soruda problem olarak belirtilen konuların nasıl ortadan kaldırılacağını açıklamaktır. Çözümler, projenin problemleriyle doğrudan ilişkili olmalı; içeriği analiz formundaki \"Proje Kapsamında Yapılacak Çalışmalar\" kısmından al. Bu kısım, problemleri çözecek çalışmaları içerir.\n\n- Başlıklar yalnızca çözüm önerileriyle ilgili olsun; problemleri burada tekrar etme, yalnızca kısa göndermeler yap.\n- Çözümleri problemlerle aynı sırada ve ilgili başlıklar altında, problemlerle ilişkilendirerek sun.\n- \"Çözüm Önerisi 1\", \"Problem 1\" gibi ifadeleri başlıklarda kullanma; içeriği doğrudan ver.\n- Bu bölümde firmanın ürününden veya kendisinden ayrıntılı söz etme.\n- Sonda, önerilen çözümlerin firmaya sağlayacağı sonuçları ikna edici biçimde özetleyen bir paragraf yaz.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 5,
+          "title": "Projenin Hedefleri",
+          "prompt_body": "### Projenin Hedefleri\n\"Firmanın bu projeye neden ihtiyaç duyduğu\" ve \"proje kapsamında yapılacak çalışmalar\" için seçilen başlıklarla uyumlu içerik üret. Proje hedefleri, firmanın önerdiği çözümleri uyguladıktan sonra neyi elde edeceğini açıkladığımız bölümdür; yani projedeki somut eylem adımları değil, bu eylemler tamamlandıktan sonra ulaşılmak istenen noktadır. Hedefler, problemlere yönelik uygulanacak çözümler açısından firmanın nerede olmak istediğini gösterir.\n\n- Bütünsel bir metin yaz; her başlığı ayrıntılı açıkla.\n- Gerçekçi olmayan, firmanın ulaşamayacağı hedefler koyma; ulaşılabilir hedefler belirle.\n- Başlıklarda \"Hedef 1\" gibi ifadeler kullanma; en az 3–4 hedef başlığı tanımla.\n- Hedefler ve bunlara ulaşmak için planlanan çalışmalar proje kapsamı içinde, uygun ve ayrıntılı açıklanmalı.\n- Bu bölümde firmanın proje adı, geçmişi, kendisi veya ürünleri hakkında bilgi verme.\n- ÖNEMLİ: Proje hedefleri iş paketi değildir; yapılacak çalışmaları veya kaç ay süreceğini ANLATMA.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 6,
+          "title": "Yöntem",
+          "prompt_body": "### Yöntem\nYöntem bölümü, proje kapsamındaki problemler için belirlenen çözümleri uygulayarak proje hedeflerine ulaşmak için kullanılacak yöntemleri anlatır. Kısa bir paragrafla başla: hedeflere ulaşmak için bir yöntem belirlendiğini, yöntemin gerekli adımları içerdiğini ve bu adımların anlatılacağını belirt.\n\nArdından, proje problem bölümünde belirlenen başlıklar çerçevesinde hedeflere ulaşmak için uygulanacak teknik yöntemleri ver; projenin nasıl yürütüleceği, kimin sorumlu olacağı, hangi tekniklerin uygulanacağı ve hangi kaynak/uzmanlığın kullanılacağına dair ayrıntıları içer.\n\n- Sürdürülebilirlik literatüründen teknik bilgiyi kullan: ilgili ISO standardı (TS EN ISO 14064-1), GHG Protocol hesaplama kılavuzu, faaliyet verisi envanteri, Kapsam 1/2/3 yaklaşımı, yeşil dönüşüm yol haritası mantığı.\n- Her adımın altında, o adımda hangi veriyle nasıl çalışılacağını açıkla; başlık kullanabilirsin.\n- Bu bölüm projenin teknik ayrıntı bölümüdür; hesaplama ve raporlama yapısını eksiksiz ve mantıklı biçimde, adım adım sun.\n- Firmanın proje adı, geçmişi, kendisi veya ürünleri hakkında bilgi verme; yalnızca projeye odaklan.\n- Başlıklarda \"Adım 1\", \"Yöntem 1\" gibi ifadeler kullanma; doğrudan yöntem başlığını yaz.",
+          "max_chars": null,
+          "target_words": 2000
+        },
+        {
+          "number": 7,
+          "title": "İş Planı",
+          "prompt_body": "### İş Planı\nSana verilen iş paketleri tablosunu/belgesini esas alarak proje iş planını hazırla. İş Planının ilk cümlesi, projenin adı ve sağına \":\" konularak **\"6 Aylık Program\"** olmalı. Ardından her iş paketini konusuna göre adlandırıp altını doldur.\n\nProje kapsamındaki iş paketleri, projenin yönteminde belirlenen konularla uyumlu olmalı ve proje kapsamında belirlenen tüm çalışmaları içermelidir.\n\nHer iş paketi başlığında 2 bölüm bulunmalı:\n1. **Faaliyetler:** O iş paketi altında yapılacak işlerin birkaç anlaşılır cümleyle açıklaması (madde sayısı sınırsız).\n2. **Çıktılar:** Her iş paketi sonunda elde edilecek belgelenmiş çıktının adı (iş paketi başına 1 çıktı; örn. Mevcut Durum ve Proje Planlama Raporu, Veri Toplama Tablosu, Emisyon Faktörleri Tablosu, Kurumsal Karbon Ayak İzi Raporu, Yeşil Dönüşüm Yol Haritası). Yalnızca adını yazmak yeterlidir.\n\nİş paketi başlığı örneği: \"İş Paketi 1 - 1. Ay - Mevcut Durum Analizi ve Eğitim\". Verilen iş paketini parafla; aynen kopyalama. Veri toplama içeren iş paketi firmayla birlikte yürütülüp mentor tarafından gözden geçirilmeli. Toplam süre 6 aydır. İş paketlerinde firmanın ürün ve makinelerini ayrıntılandırma; konu dışı iş ekleme.",
+          "max_chars": null,
+          "target_words": null
+        },
+        {
+          "number": 8,
+          "title": "Proje Yönetimi ve Organizasyonu",
+          "prompt_body": "### Proje Yönetimi ve Organizasyonu\nBu soruda projenin nasıl yürütüleceğine odaklan. Kurumsal içerikli, ikna edici üç paragraf yaz; iletişim ve net görev dağılımı, düzenli toplantılar, eğitimler, veri talebi takibi, mentor incelemesi ve proje yürütme sürecindeki geri bildirim mekanizmasını; eksikliklerin nasıl giderileceğini ve sorunlara nasıl çözüm bulunacağını anlat.\n\n- Bu bölüm projenin yöntemiyle tutarlı olmalı ancak aynı teknik bilgiyi tekrar etmemeli.\n- Firmanın ürünleri, makineleri veya geçmişi hakkındaki bilgileri kullanmana gerek yok.\n- Dil ikna edici, kurumsal ve proje yönetimi terminolojisiyle uyumlu olsun.",
+          "max_chars": null,
+          "target_words": 750
+        },
+        {
+          "number": 9,
+          "title": "Kuruluşun Ar-Ge Olanakları / Şirket Altyapısı",
+          "prompt_body": "### Kuruluşun Ar-Ge Olanakları / Şirket Altyapısı\nAşağıdaki **6 başlığı aynen** kullan ve her başlığın altına, analiz formundaki bilgilerle sınırlı kalarak 3–4 cümlelik tek bir paragraf yaz. Hayali bilgi üretme. Başlıkları **bold** yaz ve sonuna iki nokta (\":\") koy; içeriği başlıktan sonra ver.\n\n**a. Çağrı Konusuyla İlgili Deneyim:** Çevre, yeşil dönüşüm, kaynak verimliliği, kalite, çevre, enerji verimliliği veya karbon yönetimi alanındaki mevcut çalışma/belgeler; benzer bir proje yürütülmüşse analiz formundaki sınırlar içinde aktarımı.\n\n**b. Proje Yönetimi Kapasitesi ve Deneyimi:** Daha önce yürütülen ulusal/uluslararası projeler, yatırım süreçleri, yönetim sistemleri, müşteri projeleri veya kurumsal uygulamaların proje yönetimi kapasitesi açısından değerlendirilmesi.\n\n**c. Ulusal ve Uluslararası İş Birliği Deneyimi:** Analiz formunda yer alıyorsa ulusal/uluslararası müşteri, tedarikçi, proje, ihracat, iş birliği veya sektörel ağ bilgileri.\n\n**d. Personel Yetkinliği:** Firmanın insan kaynağı yapısı, teknik personel kapasitesi, idari/üretim ekibi, genç ve kadın çalışan bilgileri (analiz formundaki kadarıyla); proje için gerekli veri ve uygulama desteğini sağlayabilecek insan kaynağı kapasitesi.\n\n**e. Fiziksel Altyapı:** Firmanın üretim alanı, tesisleri, şubeleri, fabrika yapısı veya fiziksel kapasitesi (analiz formundaki kadarıyla). Bilgi yoksa tahmini ifade kullanma.\n\n**f. Sermaye Altyapısı:** Firmanın yatırım kapasitesi, geçmiş yatırımları veya finansal gücüne ilişkin analiz formundaki bilgiler; ayrıca firmanın proje sonrası gerekli yeşil dönüşüm yatırımlarını değerlendirebilecek kurumsal kapasiteye sahip olduğu makul bir dille belirtilebilir.",
+          "max_chars": null,
+          "target_words": 500
+        },
+        {
+          "number": 10,
+          "title": "Proje Sonuçları",
+          "prompt_body": "### Proje Sonuçları\nFirmanın proje sonunda elde etmeyi beklediği somut ve ölçülebilir sonuçları açıkla; bu sonuçları yalnızca firma kazanımı olarak değil, katma değerli kazanımlar olarak da vurgula. Cümleler eksik olmamalı; sonuçları detaylı ve insani bir dille anlat.\n\nProje sonuçları, iş paketlerinin çıktıları değildir; proje kapsamındaki hedeflere ulaşıldığında elde edilen kazanımlardır. Başlıkları belirlerken projenin kapsamına, hedeflerine ve iş paketlerinde uygulanacak süreçlerden doğacak olumlu sonuçlara odaklan. Başlıklar özellikle problem bölümü ve proje hedefleriyle tutarlı olmalı.\n\n- Yalnızca kurumsal kazanımlara ve proje sonu sonuçlara odaklan; faaliyet, iş paketi veya doğrudan çıktılara değil.\n- Sonuçlar için nicel hedef koyma.\n- Resmî, profesyonel ve tutarlı bir öneri dili kullan; madde işareti ve eksik cümle kullanma.\n- Ürün, makine veya teknik firma ayrıntılarından (gerekli olmadıkça) söz etme; proje kapsamı dışına çıkma.\n- Firmanın emisyon yönetimi kapasitesi, çevresel veri izleme, raporlamaya hazır olma, yeşil dönüşüm planlaması ve paydaş beklentilerine uyum kazanımlarını vurgula.\n- Tek, akıcı ve derli toplu bir metin yaz; mümkünse kısa metin içi başlıklar kullan.",
+          "max_chars": null,
+          "target_words": 750
+        },
+        {
+          "number": 11,
+          "title": "Beklenen Etki",
+          "prompt_body": "### Beklenen Etki\nBeklenen etki; projenin firmanın maliyetleri, rekabet konumu, inovasyon, paydaşları, çalışanları, toplum ve çevre, ülke ve sürdürülebilirlik kavramı üzerinde yaratması beklenen etki alanlarını ifade eder. Şimdiye kadar oluşturulan tüm içeriği dikkate alarak en fazla 3–4 beklenen etki başlığı üret; bu başlıkları firmanın hedefleri ve projenin problemine karşı elde edilecek sonuçlarla ilişkilendir.\n\n- Her başlık tek bir paragraf olsun.\n- Maddeler ve açıklamalar tamamlandıktan sonra hepsini özetleyen, sürdürülebilirlikle bağını vurgulayan ve firmaya nihai katkısını sunan bir kapanış yaz; bu son paragraf 3 cümle ve derli toplu olsun.\n- Firmanın ürün ve makine ayrıntılarını (gerekli olmadıkça) kullanma.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 12,
+          "title": "Yaygın Etki",
+          "prompt_body": "### Yaygın Etki\nYaygın etki, beklenen etkiden farklı olarak daha büyük ölçekte ve uzun vadede yaratılması beklenen etkidir. Firmanın faaliyetlerinin sektörü, ülkesi ve sürdürülebilirlik çabaları üzerindeki yaygın etkilerini ayrı başlıklar altında sun. Her başlığı **numaralandır** ve altında ikna edici, tutarlı açıklamalar yaz; açıklamalar uzun vadeyi vurgulamalı. Başlıkları firmanın hedefleri ve proje problemine karşı elde edilecek sonuçlarla ilişkilendir.\n\n- Her başlık tek bir paragraf olsun; başlıklar birbirini tekrar etmesin.\n- Yaygın etki yanıtları, beklenen etki yanıtlarından farklı olmalı: beklenen etki daha çok firmaya odaklıyken yaygın etki dış faktörlere (sektör, tedarik zinciri, bölge, ülke, sürdürülebilirlik ekosistemi) odaklanır.\n- Firmanın ürün ve makine ayrıntılarını (gerekli olmadıkça) kullanma.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 13,
+          "title": "Proje Sonrası Sürdürülebilirlik Stratejileri",
+          "prompt_body": "### Proje Sonrası Sürdürülebilirlik Stratejileri\nProje tamamlandıktan sonra firmanın yürüteceği sürdürülebilirlik çalışmalarını ve bunların amaçlarını anlatan bir metin yaz. Yani projedeki problemlere yönelik çözümler uygulandıktan sonra, bu çözümlerin olumlu etkilerini sürdürmek için düzenli olarak yapılacak faaliyetleri başlıklar altında ele al.\n\n- Proje kapsamındaki çalışmaların sürdürülebilirliğe nasıl katkı sağlayacağını mutlaka belirt.\n- Firmanın diğer sürdürülebilirlik çalışmalarındaki ilerlemesine ilişkin makul değerlendirmeler yapabilirsin (ör. kurumsal karbon ayak izi projesi sonucunda firmanın yetkinlik kazanıp bu hesabı sonraki yıllarda da sürdürmesi; yeşil dönüşüm yatırımlarının araştırılması ve yeşil dönüşüm projelerinin geliştirilmesi gibi). Makul hedefler koy.\n- Başlıkları **numaralandır**; madde işareti kullanma. Alt başlık ve açıklaması alt satırda, düz metin olarak verilsin.\n- Başlıkları ve altındaki çalışmaları yazdıktan sonra bir özet paragrafı hazırla.\n- Firmanın ürün ve makineleri hakkındaki bilgileri kullanmana gerek yok.",
+          "max_chars": null,
+          "target_words": 1000
+        }
+      ]
+    },
+    {
+      "slug": "product-carbon",
+      "label_tr": "Ürün Karbon Ayak İzi",
+      "label_en": "Product Carbon Footprint",
+      "desc_tr": "ISO 14067 kapsamında ürün karbon ayak izi (yaşam döngüsü) hesaplama ve ürün bazlı yol haritası",
+      "desc_en": "Product carbon footprint (ISO 14067 / life cycle) calculation and product-based roadmap",
+      "months": 6,
+      "work_packages": 4,
+      "question_count": 13,
+      "scope_text": "Bu proje, seçilen ürün veya ürün grubunun **ISO 14067'ye uygun Ürün Karbon Ayak İzi** hesaplamasıdır; TÜBİTAK 1831 Yeşil İnovasyon Teknoloji Mentörlük Programı (Dünya Bankası destekli, yürütücü TÜBİTAK) kapsamında, **6 aylık** olarak yürütülür.\n\n**Bu bir KURUMSAL karbon ayak izi projesi DEĞİLDİR; karıştırma.** Ana standart **ISO 14067**'dir; **ISO 14040 ve ISO 14044** yalnızca yaşam döngüsü değerlendirmesi (LCA) çerçeve standartları olarak destekleyici biçimde anılır. **ISO 14064-1'i ana metodoloji olarak kullanma**; Kapsam 1/2/3 gibi kurumsal envanter çerçevesini ana hesaplama yapısı olarak kurma.\n\nOdak: seçilen ürün; fonksiyonel birim veya beyan edilen birim; sistem sınırları; ürün yaşam döngüsü evreleri; yaşam döngüsü envanteri verisi; emisyon faktörleri; ürün düzeyinde karbon ayak izi hesabı (fonksiyonel birim başına kg CO₂e); sıcak nokta (hotspot) analizi; ürün bazlı yeşil dönüşüm yol haritası.\n\nGenel kurallar:\n- Yalnızca analiz formundaki bilgileri kullan; sayısal veri, kapasite, yatırım, makine, müşteri, sertifika UYDURMA. Bilgi yoksa varsayımda bulunma.\n- \"Biz\" dilini kullan (\"[firma adı] olarak…\", \"firmamız…\").\n- Ders kitabı düzeyinde genel bilgi yazma; ürün düzeyi hesaplamaya odaklan, firma düzeyi emisyonlara değil.\n- Karmaşık cümlelerden kaçın; açık ve sade Türkçe yaz.\n- Tüm yanıtlar Türkçe ve ilgili soru başlığının amacına uygun olmalı.\n\nDeğerlendirme dört boyutta (%25'er): programa uygunluk, yapılabilirlik, etki potansiyeli, proje ekibi yetkinliği.",
+      "sort": 1,
+      "work_package_body": "Aşağıdaki iş paketi yapısını referans al; yapıyı, paket sayısını ve çıktıları koru, sözcükleri aynen kopyalamadan firmanın ürün/ürün grubuna göre paraflayarak detaylandır. Toplam süre: 6 ay.\n\n**İş Paketi 1 — 1. Ay — Proje Başlangıcı, İş Bölümü ve Veri Kaynaklarının Tanımlanması**\n- Faaliyetler: Firma yönetimi, üretim, satın alma ve lojistik birimlerinin katılımıyla tanışma/bilgilendirme toplantısı; ürün karbon ayak izi kavramı, beşikten kapıya/mezara yaklaşımı ve hesaplama adımlarının aktarılması; üretim, lojistik ve satın alma birimlerinden sağlanacak verilerin ayrıştırılarak tanımlanması; her yaşam döngüsü evresi için gerekli faaliyet verilerinin belirlenmesi ve sorumluların atanması; veri temin yöntemleri, zaman aralıkları ve sorumluluk paylaşımının netleştirilmesi.\n- Çıktı: İş Bölümü ve Veri Kaynakları Tablosu\n\n**İş Paketi 2 — 2.–3. Ay — Ürün Yaşam Döngüsü Faaliyet Verilerinin Toplanması**\n- Faaliyetler: Belirlenen ürünler için yaşam döngüsü evrelerinin tanımlanması; her evre için 1 yıllık referans dönem esas alınarak faaliyet verilerinin toplanması; tüm hammadde, yardımcı malzeme ve ambalaj girdilerinin ürün bazında kayıt altına alınması; tedarikçi ve lojistik sağlayıcılardan taşıma verilerinin temini; üretim süreçlerinde ürün başına enerji/yakıt/yardımcı proses verilerinin ayrıştırılması (makine birim tüketimleri ve toplam üretime göre tahsisat).\n- Çıktı: Ürün Karbon Ayak İzi Faaliyet Verileri Dokümanı\n\n**İş Paketi 3 — 4. Ay — Faaliyet Verilerinin İncelenmesi ve Emisyon Faktörlerinin Belirlenmesi**\n- Faaliyetler: Toplanan verilerin incelenip eksik/tutarsız/doğrulama gerektiren alanların tespiti ve ilgili birimlerle tamamlanması; yaşam döngüsü evreleri dikkate alınarak güncel ve uluslararası kabul görmüş veri tabanlarından emisyon faktörlerinin araştırılması; seçilen faktörlerin kaynak, yıl ve kapsam bilgileriyle tablolaştırılması.\n- Çıktı: Faaliyet Verileri Kontrol ve Emisyon Faktörleri Tablosu\n\n**İş Paketi 4 — 5.–6. Ay — Ürün Karbon Ayak İzi Hesaplamaları ve Raporun Hazırlanması**\n- Faaliyetler: Onaylanan veriler ve emisyon faktörleriyle ürün karbon ayak izi hesaplamaları; her ürün için birim ürün başına değerlerin hesaplanması; yaşam döngüsü evrelerine göre emisyon dağılımı analizi; sektörde iyi örneklerin araştırılması ve kıyaslama; yüksek emisyonlu evreler için iyileştirme fırsatlarının değerlendirilmesi; rapor taslağı ve ürüne yönelik yeşil dönüşüm yol haritasının hazırlanıp firma geri bildirimiyle nihai hale getirilmesi.\n- Çıktı: Ürün Karbon Ayak İzi Raporu; Yeşil Dönüşüm Yol Haritası",
+      "sections": [
+        {
+          "number": 1,
+          "title": "Projenin Kısa Tanıtımı",
+          "prompt_body": "### Projenin Kısa Tanıtımı\nProjenin amacını doğrudan vurgula; bu amaca ulaşmak için yapılacak çalışmaları kısaca özetle ve somut hedefleri öne çıkar. Proje amacı, seçilen ürün veya ürün grubunun **ISO 14067'ye uygun Ürün Karbon Ayak İzi**'nin hesaplanmasıdır. Kısaca şunları içereceğini belirt: ürün seçimi, fonksiyonel birim/beyan edilen birimin tanımlanması, sistem sınırlarının belirlenmesi, yaşam döngüsü envanteri verilerinin toplanması, emisyon faktörlerinin eşleştirilmesi, fonksiyonel birim başına kg CO₂e cinsinden hesaplama, sıcak nokta analizi ve ürün bazlı yeşil dönüşüm yol haritasının hazırlanması.\n\n- Özet, çekirdek teknolojik alanlardaki uzmanlara sunulacağı için genel iklim değişikliği/sürdürülebilirlik tanımlarını, firma geçmişini ve ders kitabı açıklamalarını tekrar etme; çalışılacak teknik ayrıntılara odaklan.\n- Başlık kullanma; eksiksiz bilgi ver. 4 paragraf olacak şekilde kurgula; projenin tamamını özetle ve güçlü bir proje imajı sun.\n- Son paragrafta firmanın faaliyetlerini, seçilen ürün/ürün grubunu, projeyi hangi amaçla yürüttüğünü ve proje sonu olası kazanımları belirt.\n- Bilgiyi analiz formunun \"Projeye İhtiyaç Gerekçeleri\" ve \"Ürünler ve Markalar\" kısımlarından al; firma adını analiz formundaki gibi kullan. \"Biz\" dilini kullan; sade kavram ve cümleler tercih et.",
+          "max_chars": 1500,
+          "target_words": null
+        },
+        {
+          "number": 2,
+          "title": "Projenin Çağrı ile İlişkisi",
+          "prompt_body": "### Projenin Çağrı ile İlişkisi\nBu proje, Dünya Bankası destekli ve TÜBİTAK tarafından yürütülen 1831 Yeşil İnovasyon Teknoloji Mentörlük Programı kapsamındadır. Giriş paragrafında, ürün karbon ayak izi hesaplama projesinin çağrının amaçları doğrultusunda önemli bir adım olduğunu açıkla; firma adını belirt ve projeyi yürütme amacının çağrıyla doğrudan ilişkili olduğunu söyleyen bir cümle ekle. Giriş paragrafı en az 5 cümle olsun.\n\nArdından aşağıdaki ana başlığı ve **3 alt başlığı** kullan; her başlık altında firmanın bu projeye neden ihtiyaç duyduğunu, projenin çağrıda tanımlı her başlıkla nasıl örtüştüğüne dair geçerli gerekçelerle anlat (konu dışına çıkma):\n\n**Projenin Çağrıya İlişkisi** (ana başlık)\n\n1. **Yeşil Dönüşüm ve Sürdürülebilirlik Hedefleri** — programın neden ve kim tarafından yürütüldüğü, KOBİ'lere faydaları ve ISO 14067 kapsamında yapılacak ürün karbon ayak izi hesabının yeşil dönüşüm gereksinimlerini nasıl karşıladığı; ürün düzeyinde iklim etkisinin anlaşılması, yoğun emisyonlu evrelerin belirlenmesi ve daha somut iyileştirme aksiyonları geliştirilmesi.\n2. **Teknik Danışmanlık ve Kapasite Artırımı** — hibe oranını belirt; bu yüksek oranla firmanın gereken teknik bilgiye erişimi. Ürün karbon ayak izinin fonksiyonel birim tanımı, sistem sınırı, yaşam döngüsü envanteri verisi, uygun emisyon faktörü seçimi, gerekli yerlerde tahsisat ve ürün düzeyi raporlama gibi teknik bilgi gerektirdiğini vurgula.\n3. **Çözüm Yaklaşımları ve Yol Haritası Hazırlama** — çağrının yalnızca mevcut durum değil, uygulanabilir çözüm yaklaşımları ve yol haritası beklediğini belirt. Yol haritasının genel bir sürdürülebilirlik yol haritası değil; hammadde, üretim süreçleri, enerji, ambalaj, lojistik, atık yönetimi, tedarikçi veri kalitesi ve ürün tasarımı gibi alanlarda iyileştirme aksiyonları içeren **ürün odaklı** bir yeşil dönüşüm yol haritası olacağını açıkla.\n\nSonda, bu hedeflerle uyumlu bir proje önerisi olduğunu özetleyen birkaç cümlelik bir paragraf yaz.",
+          "max_chars": null,
+          "target_words": 1000
+        },
+        {
+          "number": 3,
+          "title": "Problem Tanımı",
+          "prompt_body": "### Problem Tanımı\nAnaliz formundaki \"Projeye İhtiyaç Gerekçeleri / Problem Tanımı\" kısmını esas al. Firmanın bu projeye neden ihtiyaç duyduğunu tanımla ve her maddenin projeyi neden gerekli kıldığını ikna edici biçimde açıkla. Yapılacak işi firma için bir ihtiyaç olarak ifade et. Firmanın seçilen ürününün karbon ayak izini daha önce ISO 14067'ye uygun hesaplamadığını ve bu nedenle **ürün düzeyinde** karbon verisinin bulunmadığını belirtebilirsin.\n\n**Problemi kurumsal karbon ayak izi verisinin eksikliği olarak tanımlama; odak ürün düzeyi karbon ayak izi hesabının eksikliğidir.**\n\nOlası problem başlıkları (analiz formuna göre uyarlanmalı, aynen kopyalanmamalı): ürün düzeyinde karbon ayak izi verisinin hesaplanmamış olması; yaşam döngüsü envanteri verisinin ürün düzeyinde yapılandırılmamış olması; ürün yaşam döngüsündeki emisyon sıcak noktalarının bilinmemesi; ürün bazlı yeşil dönüşüm yol haritasının hazırlanmamış olması; müşteri/tedarik zinciri/pazar beklentilerinin ürün düzeyi karbon verisi gerektirmesi.\n\n- Her başlığın altını en az 5–6 cümlelik paragraflarla açıkla.\n- Başlık, açıklama ve gerekçelerin ardından \"Genel Değerlendirme\" başlığı ekle; bu alandaki genel sorunları 5 cümlede özetle, 6. cümlede bu sorunların çözülmesinin olumlu etkisini vurgula.\n- Örnek başlıkları aynen kopyalama; firmanın seçilen ürününe göre özgün başlıklar üret.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 4,
+          "title": "Çözüm Önerisi",
+          "prompt_body": "### Çözüm Önerisi\nÖnce tek paragraflık bir giriş yaz: \"proje kapsamında\" ve \"firma olarak\" hedeflere ulaşmak için planların olduğunu vurgula, yapılacak işi iki cümleyle özetle ve bu çalışmanın firmayı nasıl güçlendireceğine dair bir cümle ekle.\n\nÇözüm önerisinin ana mesajı: önceki soruda problem olarak belirtilen konuların nasıl ortadan kaldırılacağını açıklamaktır. Çözümler problemlerle doğrudan ilişkili olmalı; içeriği analiz formundaki \"Proje Kapsamında Yapılacak Çalışmalar\" kısmından al.\n\nOlası çözüm başlıkları: ürün seçimi, fonksiyonel birim ve sistem sınırı tanımı (ISO 14067'ye uygun; sınır beşikten kapıya/müşteriye/mezara olabilir); ürün düzeyi yaşam döngüsü envanteri verisi toplama; emisyon faktörü eşleştirme ve ürün karbon ayak izi hesabı (fonksiyonel birim başına kg CO₂e; varsayım, veri kaynağı, tahsisat kuralı, veri kalitesi ve sınırların belgelenmesi); sıcak nokta analizi ve iyileştirme fırsatlarının belirlenmesi; ürün bazlı yeşil dönüşüm yol haritası (kısa/orta/uzun vadeli aksiyonlar, sorumlu birimler, izleme göstergeleri, gerçekçi öncelikler).\n\n- Başlıklar yalnızca çözümlerle ilgili olsun; problemleri tekrar etme. \"Çözüm Önerisi 1\", \"Problem 1\" gibi ifadeler kullanma.\n- Çözümleri problemlerle aynı sırada ve ilişkilendirerek sun. Firmanın ürününden/kendisinden gereksiz ayrıntıyla söz etme; yalnızca proje çözümlerine odaklan.\n- Sonda, çözümlerin firmaya sağlayacağı sonuçları ikna edici biçimde özetleyen bir paragraf yaz.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 5,
+          "title": "Projenin Hedefleri",
+          "prompt_body": "### Projenin Hedefleri\n\"Firmanın bu projeye neden ihtiyaç duyduğu\" ve \"proje kapsamında yapılacak çalışmalar\" için seçilen başlıklarla uyumlu içerik üret; yani problemlere karşı atılacak adımları proje hedefi olarak yaz. Hedefler, uygulanan çözümler sonucunda firmanın nerede olmak istediğini açıkça göstermeli; bu hedeflerin ne olduğu ve kapsamında yapılacak çalışmalar ayrıntılı anlatılmalı.\n\nHedefler gerçekçi ve proje süresinde ulaşılabilir olmalı; tam ürün yeniden tasarımı, anında sertifikasyon, sıfır karbon ürün iddiası, karbon nötrlüğü veya emisyonların tamamen ortadan kaldırılması gibi gerçekçi olmayan hedefler — analiz formunda açıkça yer almıyorsa — koyma.\n\nOlası hedef başlıkları: ISO 14067'ye uygun ürün karbon ayak izinin hesaplanması (fonksiyonel/beyan edilen birim başına kg CO₂e); ürün düzeyi yaşam döngüsü envanteri veri yapısının oluşturulması; ürün yaşam döngüsü sıcak noktalarının belirlenmesi; ürün bazlı yeşil dönüşüm yol haritasının hazırlanması; pazar/müşteri/tedarik zinciri hazırlığının güçlendirilmesi (sertifikasyon/doğrulama iddiası, projeye dâhil değilse yapılmaz).\n\n- Bütünsel bir metin yaz; her başlığı ayrıntılı açıkla. Başlıklarda \"Hedef 1\" gibi ifadeler kullanma; en az 4 hedef başlığı belirle.\n- Örnek başlıkları aynen kopyalama; firmanın ürününe göre özgünleştir. Firmanın geçmişi/ürünleri hakkında (gerekmedikçe) bilgi verme; yalnızca projeye odaklan.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 6,
+          "title": "Yöntem",
+          "prompt_body": "### Yöntem\nYöntem bölümü, proje kapsamındaki problemler için belirlenen çözümleri uygulayarak proje hedeflerine ulaşmak için kullanılacak yöntemleri anlatır. Kısa bir paragrafla başla: hedeflere ulaşmak için bir yöntem belirlendiğini, gerekli adımları içerdiğini ve adımların anlatılacağını belirt.\n\nMetodoloji **ISO 14067** temelli olmalı; ISO 14040 ve ISO 14044 yalnızca LCA çerçeve standartları olarak anılabilir. **ISO 14064-1'i proje metodolojisi olarak kullanma; Kapsam 1/2/3'ü ana hesaplama çerçevesi olarak kurma** — bu bir kurumsal envanter projesi değildir.\n\nAşağıdaki yöntem başlıklarını kullan ve her birinin altında firmanın hangi veriyle nasıl çalışacağını açıkla:\n- **Ürün Seçimi ve Amaç-Kapsam Tanımı** — ürün/ürün grubunun üretim yapısı, pazar öncelikleri ve veri uygunluğuna göre seçimi; çalışmanın amacı, sonuçların kullanımı, hedef kitle, fonksiyonel/beyan edilen birim, referans akış ve sistem sınırının tanımı.\n- **Sistem Sınırı ve Yaşam Döngüsü Evreleri** — ISO 14067'ye uygun sınır; kapsama göre hammadde tedariki, üretim, yardımcı malzeme, enerji, ambalaj, atık, lojistik, kullanım ve ömür sonu evreleri; beşikten kapıya veya kısmi PCF ise bunun açıkça belirtilmesi.\n- **Yaşam Döngüsü Envanteri Verisi Toplama** — ürün düzeyi faaliyet verileri (hammadde miktarları, tedarikçi bilgisi, yardımcı malzemeler, ürüne tahsis edilen elektrik/yakıt, proses verisi, ambalaj, fire/atık, taşıma vb.); kaynak, birim, dönem, varsayım ve sorumluların belgelenmesi.\n- **Veri Kalitesi, Varsayımlar ve Tahsisat Kuralları** — tamlık, tutarlılık, zamansal/coğrafi/teknolojik temsiliyet ve güvenilirlik değerlendirmesi; çok ürünlü süreçlerde tahsisat kuralları; varsayım, dışlama ve kesme (cut-off) kriterlerinin açıklanması.\n- **Emisyon Faktörü Seçimi ve Hesaplama** — her faaliyet verisi için uygun faktör seçimi; fonksiyonel/beyan edilen birim başına kg CO₂e hesabı; küresel ısınma potansiyeli ile CO₂ eşdeğeri; faktör kaynakları ve dönüşüm yöntemlerinin belgelenmesi.\n- **Raporlama ve Ürün Bazlı Yol Haritası** — ISO 14067 ilkelerine uygun rapor (amaç-kapsam, birim, sistem sınırı, veri kaynakları, varsayımlar, sonuçlar, veri kalitesi, kısıtlar, sıcak nokta analizi, iyileştirme önerileri); rapora dayalı ürün bazlı yeşil dönüşüm yol haritası.\n\nBaşlıkları aynen kopyalama; firmanın ürününe göre özgünleştir. Firmanın geçmişi/ürünleri hakkında (yöntemle doğrudan ilgili değilse) bilgi verme.",
+          "max_chars": null,
+          "target_words": 2000
+        },
+        {
+          "number": 7,
+          "title": "İş Planı",
+          "prompt_body": "### İş Planı\nSana ayrıca verilen iş paketleri tablosunu/belgesini **esas referans** alarak proje iş planını hazırla; aynen kopyalama, parafla ve gerekli yerde ifadeyi geliştirip faaliyetleri açık ve profesyonel biçimde detaylandır, ancak verilen iş paketi yapısıyla tam tutarlı kal. İş Planının ilk cümlesi projenin adını ve ardından **\"6 Aylık Program\"** ifadesini içermeli.\n\nHer iş paketini, belgedeki ay ve konuya göre yaz. Belgede aylar, iş paketi başlıkları, faaliyetler, çıktılar verilmişse bunları birincil kaynak al; belge eksik veya mantıksal olarak tutarsız değilse farklı bir iş paketi yapısı uydurma. Detaylandırma gerekiyorsa yalnızca Ürün Karbon Ayak İzi hesabının teknik kapsamı içinde genişlet.\n\nHer iş paketi başlığı; iş paketi numarası, ay/aylar ve projeye özgü açık bir başlık içermeli (başlık gerekirse paraflanır, anlamı korunur).\n\nHer iş paketinde iki bölüm bulunmalı:\n- **Faaliyetler:** O iş paketinde yürütülecek işler, profesyonel TÜBİTAK proje diliyle, açık cümlelerle. Faaliyetler ürün karbon ayak izi, ISO 14067 metodolojisi, ürün düzeyi yaşam döngüsü envanteri, emisyon faktörü eşleştirme, hesaplama, sıcak nokta analizi, raporlama ve ürün bazlı yol haritası ile doğrudan ilişkili olmalı.\n- **Çıktılar:** Her iş paketi sonunda elde edilecek belgelenmiş çıktı (belgedeki çıktı adları varsa gerektiğinde paraflanarak kullanılır; normalde iş paketi başına bir ana çıktı).\n\nİş planı projenin yöntem bölümüyle tam tutarlı olmalı. Kurumsal karbon ayak izi/ISO 14064-1 envanteri, genel sürdürülebilirlik veya ilgisiz danışmanlık faaliyeti ekleme; proje ISO 14067 kapsamında ürün karbon ayak izine odaklı kalmalı. Firmanın geçmişi/ürünleri/makineleri gereksiz ayrıntılandırılmaz.",
+          "max_chars": null,
+          "target_words": null
+        },
+        {
+          "number": 8,
+          "title": "Proje Yönetimi ve Organizasyonu",
+          "prompt_body": "### Proje Yönetimi ve Organizasyonu\nProjenin nasıl yürütüleceğine odaklan. Kurumsal içerikli, ikna edici üç paragraf yaz; iletişim ve net görev dağılımı, düzenli toplantılar, eğitim, veri talebi takibi, mentor incelemesi, proje yürütme sürecindeki geri bildirim ve eksikliklerin/sorunların nasıl çözüleceğini anlat.\n\nYanıt şunları içermeli: rol ve sorumlulukların net atanması; firma ekibi ile Çözüm Ortağı arasında koordinasyon; düzenli proje toplantıları; veri toplama takibi ve eksik veri yönetimi; eğitim ve farkındalık faaliyetleri; mentor inceleme ve geri bildirim mekanizması; dokümantasyon disiplini; risk ve sorun çözme yaklaşımı.\n\n- Bu bölüm projenin yöntemiyle tutarlı olmalı ancak aynı teknik bilgiyi tekrar etmemeli.\n- Firmanın ürün, makine veya geçmişi hakkındaki bilgileri kullanmana gerek yok.",
+          "max_chars": null,
+          "target_words": 750
+        },
+        {
+          "number": 9,
+          "title": "Kuruluşun Ar-Ge Olanakları / Şirket Altyapısı",
+          "prompt_body": "### Kuruluşun Ar-Ge Olanakları / Şirket Altyapısı\nAşağıdaki **6 başlığı aynen** kullan; her başlığın altına 3–4 cümlelik tek bir paragraf yaz. Başlıkları **bold** yap, sonuna iki nokta (\":\") koy ve içeriği başlıktan sonra ver. Yalnızca analiz formundaki bilgileri kullan.\n\n**a. Çağrı Konusuyla İlgili Deneyim:** Daha önceki çevre, sürdürülebilirlik, enerji verimliliği, kalite, ürün iyileştirme, yaşam döngüsü, karbon ayak izi, yeşil dönüşüm veya müşteri sürdürülebilirlik gereksinimi çalışmaları; benzer bir yeşil dönüşüm projesi yürütülmüşse aktarımı.\n\n**b. Proje Yönetimi Kapasitesi ve Deneyimi:** Daha önce yürütülen ulusal/uluslararası projeler ve deneyim kazanılan projeler; firmanın gerekli veriyi sağlama ve projeyi takip etme kapasitesi.\n\n**c. Ulusal ve Uluslararası İş Birliği Deneyimi:** Firmanın ulusal/uluslararası pazarlardaki iş birlikleri, müşterileri, tedarikçileri, dağıtıcıları, ihracat kanalları veya iş ortakları; ürün düzeyi karbon verisinin tedarik zinciri iletişimindeki önemiyle ilişkilendir.\n\n**d. Personel Yetkinliği:** Firmanın insan kaynağı yapısı, teknik ekip, üretim ekibi, kalite ekibi, muhasebe ekibi, sürdürülebilirlik ilişkili personel ve veri toplamayı destekleyecek kadro.\n\n**e. Fiziksel Altyapı:** Firmanın üretim tesisleri, şubeleri, depoları, fabrikaları, mağazaları, üretim alanı, makine parkı ve seçilen ürünle ilgili fiziksel altyapısı.\n\n**f. Sermaye Altyapısı:** Firmanın geçmiş yatırımları; bu proje sırasında ve sonrasında yol haritasına dayalı gerekli yeşil dönüşüm yatırımlarını yapabileceğine dair bir-iki cümlelik ikna edici ifade.",
+          "max_chars": null,
+          "target_words": 500
+        },
+        {
+          "number": 10,
+          "title": "Proje Sonuçları",
+          "prompt_body": "### Proje Sonuçları\nİşletmenin proje sonunda elde etmeyi beklediği somut ve ölçülebilir kazanımları açıkla; bunları yalnızca firma kazanımı olarak değil katma değerli kazanımlar olarak da vurgula.\n\nProje sonuçları, iş paketi çıktıları değildir; hedeflere ulaşıldığında elde edilen kazanımlardır. Başlıkları belirlerken projenin kapsamına, hedeflerine ve iş paketlerinde uygulanacak süreçlerden doğacak olumlu sonuçlara odaklan; başlıklar problem tanımı ve proje hedefleriyle tutarlı olmalı. Her başlık, bu sonuçların firmaya ne kazandıracağını açıklamalı.\n\nOlası başlıklar: fonksiyonel birim başına ürün karbon ayak izi sonucu; ürün düzeyi veri altyapısı; emisyon sıcak noktalarının belirlenmesi; ürün bazlı iyileştirme ve yatırım öncelikleri; müşteri ve tedarik zinciri hazırlığının güçlenmesi.\n\n- Her başlık altında, hedeflere ulaşıldığında elde edilecekleri en az iki paragrafla açıkla.\n- Sonuçları proje kapsamı dışı konularla ilişkilendirme; firmanın geçmişi/ürünleri/makineleri hakkında (gerekmedikçe) bilgi verme.\n- Örnek başlıkları aynen kopyalama; firmanın seçilen ürününe, ISO 14067 hesap kapsamına, birime, yaşam döngüsü envanterine, sıcak nokta analizine ve ürün bazlı yol haritasına göre özgünleştir.",
+          "max_chars": null,
+          "target_words": 750
+        },
+        {
+          "number": 11,
+          "title": "Beklenen Etki",
+          "prompt_body": "### Beklenen Etki\nBeklenen etki; projenin firmanın maliyetleri, rekabet konumu, inovasyon kapasitesi, paydaşları, çalışanları, toplum ve çevre, ülke ve sürdürülebilirlik kavramı üzerinde yaratması beklenen etki alanlarını ifade eder. Şimdiye kadar oluşturulan içeriği dikkate alarak en fazla 3–4 beklenen etki başlığı üret; başlıklar firmanın hedefleri ve proje sonuçlarıyla ilişkili olmalı.\n\nOlası başlıklar: ürün düzeyi karbon yönetim kapasitesinin güçlenmesi; müşteri ve ihracat pazarlarında rekabetçiliğin desteklenmesi; veri temelli iyileştirme ve maliyet odaklı verimlilik aksiyonlarının mümkün kılınması (doğrudan maliyet düşüşü iddia etme; potansiyel verimlilik alanlarının belirlenmesine yardımcı olacağını belirt); iç farkındalık ve kurumsal sürdürülebilirlik kapasitesinin artması.\n\n- Her başlık tek bir paragraf olsun. Maddeler tamamlandıktan sonra hepsini özetleyen, sürdürülebilirlikle bağını vurgulayan ve firmaya nihai katkısını sunan, 3 cümlelik derli toplu bir kapanış paragrafı yaz.\n- Örnek başlıkları aynen kullanma; firmanın hedefleri, proje sonuçları, ürün düzeyi karbon yönetim kapasitesi, müşteri/pazar hazırlığı, veri temelli iyileştirme potansiyeli ve iç sürdürülebilirlik kapasitesiyle uyumlu, projeye özgü başlıklar üret.\n- Firmanın ürün/makine ayrıntılarını (gerekmedikçe) kullanma.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 12,
+          "title": "Yaygın Etki",
+          "prompt_body": "### Yaygın Etki\nYaygın etki, beklenen etkiden farklı olarak daha büyük ölçekte ve uzun vadede yaratılması beklenen etkidir. Firmanın ürün karbon ayak izi projesinin sektörü, tedarik zinciri, ülkesi ve sürdürülebilirlik çabaları üzerindeki yaygın etkilerini ayrı başlıklar altında sun. Her başlığı **numaralandır** ve altında ikna edici, tutarlı, uzun vadeyi vurgulayan açıklamalar yaz.\n\nBeklenen etki firmaya odaklıyken yaygın etki dış faktörlere (sektör, tedarik zinciri, bölge, ülke, sürdürülebilirlik ekosistemi) odaklanır; yanıtlar beklenen etkiden farklı olmalı.\n\nOlası başlıklar: sektörde ürün düzeyi karbon şeffaflığına katkı; tedarik zinciri veri kalitesinin iyileşmesi; yeşil dönüşüm ve düşük karbonlu üretim kapasitesine katkı; ulusal sürdürülebilirlik ve ihracat rekabetçiliğine katkı.\n\n- Her başlık tek bir paragraf olsun; başlıklar birbirini tekrar etmesin.\n- Örnek başlıkları aynen tekrar etme; projenin sektör, tedarik zinciri, ulusal yeşil dönüşüm kapasitesi, ihracat rekabetçiliği ve sürdürülebilirlik ekosistemi üzerindeki uzun vadeli etkilerini yansıtan özgün başlıklar üret.\n- Firmanın geçmişi/makine ayrıntılarını (gerekmedikçe) kullanma.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 13,
+          "title": "Proje Sonrası Sürdürülebilirlik Stratejileri",
+          "prompt_body": "### Proje Sonrası Sürdürülebilirlik Stratejileri\nProje tamamlandıktan sonra firmanın yürüteceği sürdürülebilirlik çalışmalarını ve amaçlarını anlatan bir metin yaz; ardından bunları **numaralı** başlıklarla açıkla. Madde işareti kullanma; her alt başlık ve açıklaması düz metin olarak (alt başlık alt satırda) verilsin.\n\nAmaç, ürün karbon ayak izi projesinin olumlu etkilerinin proje sonrasında nasıl sürdürüleceğini açıklamaktır. Odak: Ürün Karbon Ayak İzi, ISO 14067 temelli veri yapısı, ürün düzeyi izleme, sıcak nokta temelli iyileştirme aksiyonları, tedarikçi veri kalitesi, müşteri iletişimi ve yeşil dönüşüm yol haritası takibi.\n\n- Kurumsal karbon ayak izi hesabını tekrarlamaktan söz etme; odağı ISO 14064-1'e kaydırma.\n- Olası başlıklar: ürün düzeyi yaşam döngüsü envanteri verisinin düzenli güncellenmesi; yol haritasındaki iyileştirme aksiyonlarının izlenmesi; tedarikçi veri kalitesi ve malzeme bazlı iyileştirme takibi; sonuçların müşteri/pazar iletişiminde dikkatli ve dayanaksız iddiasız kullanımı; yeni yeşil dönüşüm proje fikirlerinin geliştirilmesi; üretim, satın alma, kalite, lojistik, muhasebe ve yönetim birimlerinin katılımıyla iç farkındalık ve kurumsal süreklilik.\n- Örnek başlıkları aynen kopyalama; projeye özgü başlıklar üret.\n- Başlıkları numaralandırıp altlarındaki çalışmaları anlattıktan sonra, projenin tek seferlik bir hesaplama olmayıp tekrarlanabilir bir ürün düzeyi sürdürülebilirlik yönetimi yaklaşımı oluşturacağını özetleyen bir kapanış paragrafı yaz.",
+          "max_chars": null,
+          "target_words": 1000
+        }
+      ]
+    },
+    {
+      "slug": "water-efficiency",
+      "label_tr": "Su Verimliliği / Mavi Sertifika",
+      "label_en": "Water Efficiency / Blue Certificate",
+      "desc_tr": "Su Verimliliği Yönetmeliği ve Mavi Sertifika hazırlığı (karbon terimi yok)",
+      "desc_en": "Water Efficiency Regulation and Blue Certificate readiness (no carbon terms)",
+      "months": 4,
+      "work_packages": 4,
+      "question_count": 13,
+      "scope_text": "Bu proje, bir şirket için **su verimliliği ve Mavi Sertifika hazırlık** projesidir.\r\n**Bu bir kurumsal karbon ayak izi hesaplama projesi DEĞİLDİR.**\r\n\r\nOdak: Su Verimliliği Yönetmeliği kapsamında mevcut durum analizi, Mavi Sertifika başvurusuna hazırlık, su verimliliği yönetim kapasitesinin geliştirilmesi, Mevcut Durum Veri Formu hazırlığı, sektörel kılavuzların incelenmesi, performans hedeflerinin belirlenmesi ve başvuru formunun hazırlanması.\r\n\r\n**Kesinlikle kullanılmayacak ifadeler:** ISO 14064-1, GHG Protocol, Kapsam 1-2-3, emisyon faktörü, sera gazı envanteri, karbon ayak izi hesaplaması, karbon ayak izi raporu.\r\n\r\nTüm yanıtlar şu temalar etrafında kurulmalı: su verimliliği, kaynak verimliliği, Mavi Sertifika, mevcut değerler, performans hedefleri, veri izleme, form revizyonu, su verimliliği yönetim ekibi ve başvuru belgeleri.\r\n\r\nKurallar:\r\n- Yalnızca analiz formundaki bilgileri kullan; sayısal veri, kapasite, yatırım, makine, müşteri, sertifika uydurma.\r\n- Şirket Su Verimliliği Yönetmeliği kapsamındaysa bunu açıkça kullan; gönüllü ise zorunluluk dilini değil, kurumsal hazırlık/kaynak verimliliği/sürdürülebilirlik/rekabetçilik dilini kullan. Bu ayrımı analiz formuna göre yap, varsayımda bulunma.",
+      "sort": 2,
+      "work_package_body": "Aşağıdaki iş paketi yapısını referans al; yapıyı, paket sayısını ve çıktıları koru, sözcükleri aynen kopyalamadan firmaya göre paraflayarak detaylandır. Toplam süre: 4 ay.\n\n**İş Paketi 1 — 1. Ay — Proje Başlangıcı, Su Verimliliği Eğitimi ve Yönetim Ekibinin Oluşturulması**\n- Faaliyetler: Firma ile proje başlangıç toplantısı; Mavi Belge başvuru sürecinin amacı, temel adımları ve beklenen çıktıların açıklanması; Su Verimliliği Yönetmeliği kapsamında kurulması gereken iç yönetim yapısının değerlendirilmesi; çalışanlara su verimliliği farkındalık eğitimi; ekip üyelerinin sorumluluk alanlarının netleştirilmesi.\n- Çıktı: Su Verimliliği Eğitimi Sunumu; Su Verimliliği Yönetim Ekibi Görev Tanımları\n\n**İş Paketi 2 — 2. Ay — Sektör Kılavuzlarının İncelenmesi ve Mevcut Durum Veri Formunun Hazırlanması**\n- Faaliyetler: Firmanın faaliyet alanına uygun sektör kılavuzları ve Mavi Belge başvuru gerekliliklerinin incelenmesi; başvuru formu ve Mevcut Durum Veri Formu için bilgi başlıklarının belirlenmesi; mevcut su kullanımı, proses yapısı ve izleme düzenine ilişkin verilerin derlenmesi; eksik bilgilerin firma ekibiyle tamamlanması; Mevcut Durum Veri Formu ilk taslağının hazırlanması.\n- Çıktı: Mevcut Durum Veri Formu\n\n**İş Paketi 3 — 3. Ay — Performans Hedeflerinin Belirlenmesi ve Başvuru Formunun Hazırlanması**\n- Faaliyetler: Mevcut Durum Veri Formu değerlerinin kontrolü; geliştirilmesi gereken alanların sektör araştırması üzerinden belirlenmesi; mevcut değerlere ve sektör kılavuzlarına uygun performans hedeflerinin oluşturulması; su tüketiminin azaltılması ve izlenebilirliğin artırılmasına yönelik faaliyetlerin tanımlanması; başvuru formunun ve Mevcut Durum Veri Formunun birbiriyle uyumlu hale getirilmesi.\n- Çıktı: Başvuru Formu\n\n**İş Paketi 4 — 4. Ay — Nihai Başvuru Dosyası, Takip Sistemi ve Form Revizyon Eğitimi**\n- Faaliyetler: Firma ekibine mevcut değerlerin ve performans hedeflerinin nasıl takip edileceğinin aktarılması; ISO 14046 ile uyumlu su ayak izi hesaplaması; formların hangi durumlarda ve nasıl revize edileceğine ilişkin farkındalık eğitimi; Mavi Belge başvurusuna hazır nihai dosyaların firmaya teslimi.\n- Çıktı: Su Verimliliği Performans Hedef Takip Tablosu; Su Ayak İzi Raporu",
+      "sections": [
+        {
+          "number": 1,
+          "title": "Projenin Kısa Tanıtımı",
+          "prompt_body": "### Projenin Kısa Tanıtımı\nAnaliz formundaki şirket için su verimliliği ve Mavi Sertifika hazırlık projesinin amacını doğrudan vurgula; projenin ne amaçladığını, hangi temel faaliyetlerin yürütüleceğini ve şirketin sonunda elde edeceği faydaları açıkla.\r\n- Başlıksız, **4 kısa paragraf**.\r\n- \"Şirketimiz / (Şirket Adı) olarak / bu proje ile\" dili kullan. Şirket adını analiz formundaki gibi yaz.\r\n- Bilgiyi analiz formundaki \"Proje Kapsamı\" ve \"Projeye İhtiyaç Nedenleri\" bölümlerinden al. Ürün/faaliyet alanı yalnızca gerekliyse kısaca anılsın.\r\n- Genel proje yönetimi anlatıları, şirket tarihçesi, su verimliliğinin ders kitabı tanımları kullanma.\r\n- Şirket Su Verimliliği Yönetmeliği kapsamında ise (formda belirtilmişse) kullan; belirtilmemişse varsayım yapma.",
+          "max_chars": 1500,
+          "target_words": null
+        },
+        {
+          "number": 2,
+          "title": "Projenin Çağrı ile İlişkisi",
+          "prompt_body": "### Projenin Çağrı ile İlişkisi\nGiriş paragrafında, şirketin su verimliliği ve Mavi Sertifika hazırlık projesinin KOBİ'lerin yeşil dönüşüm ve sürdürülebilirlik kapasitesini artırma amacıyla uyumlu olduğunu açıkla.\r\n\r\nAna başlık: **Projenin Çağrı ile İlişkisi**. Aşağıdaki 3 alt başlığı **aynen** kullan:\r\n1. **Yeşil Dönüşüm ve Sürdürülebilirlik Hedefleri ile İlişki** — su verimliliği yönetimini güçlendirme, mevcut su kullanımını izlenebilir kılma ve Mavi Sertifika sürecine hazırlanmanın bu amaçla uyumu. **Karbon ayak izi/emisyon ifadeleri kullanma.**\r\n2. **Teknik Danışmanlık ve Kapasite Geliştirme ile İlişki** — Su Verimliliği Yönetmeliği, sektörel kılavuzlar, Mevcut Durum Veri Formu, Başvuru Formu ve performans hedefleri konusunda teknik kapasite kazanımı.\r\n3. **Çözüm Yaklaşımları ve Yol Haritası Hazırlığı ile İlişki** — mevcut değerlerin belirlenmesi, su verimliliği hedeflerinin oluşturulması ve bunları izleyecek yapının kurulması.\r\n\r\nSonunda projenin çağrı hedefleriyle uyumlu olduğunu vurgulayan kısa özet paragrafı yaz.",
+          "max_chars": null,
+          "target_words": 1000
+        },
+        {
+          "number": 3,
+          "title": "Problem Tanımı",
+          "prompt_body": "### Problem Tanımı\nAnaliz formundaki \"Projeye İhtiyaç Nedenleri\" bölümünü esas al. Şirketin bu projeyi neden yapması gerektiğini açıkla. Metin; Su Verimliliği Yönetmeliği kapsamında olmak, Mavi Sertifika sürecine hazırlanmak, mevcut durum verisini sistematikleştirmek, su kullanımına ilişkin performans hedefleri belirlemek ve izleme/revizyon yapısı kurmak gibi ihtiyaçlara dayansın.\r\n\r\n- Şirket yönetmelik kapsamındaysa bunu açıkça kullan; gönüllü ise zorunluluk dili kullanma (kurumsal hazırlık, kaynak verimliliği, sürdürülebilirlik, rekabetçilik dili). Varsayım yapma.\r\n- Her başlık altında 5-6 cümle. \"Problem 1\" gibi başlık kullanma.\r\n- Proje adı, ürün detayı, kapasite, makine parkı ve şirket tarihçesi yer almasın; odak yalnızca projenin neden gerekli olduğu.\r\n- **karbon ayak izi, emisyon, sera gazı, ISO 14064 ifadeleri kesinlikle kullanılmaz.**\r\n- Örnek başlıklar (gerekirse farklı/ek başlık kullanılabilir): Yönetmelik Kapsamı ve Mavi Sertifika Hazırlık İhtiyacı; Mevcut Su Kullanımı Verisinin Sistematikleştirilmesi; Performans Hedefleri ve İzleme Yapısının Kurulması; Çalışan Farkındalığı ve Kurumsal Sorumlulukların Netleştirilmesi.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 4,
+          "title": "Çözüm Önerisi",
+          "prompt_body": "### Çözüm Önerisi\nİlk paragrafta, şirketin su verimliliği yönetimini güçlendirmeye, Mavi Sertifika başvuru hazırlıklarını tamamlamaya ve mevcut değerler ile performans hedeflerini izlenebilir kılmaya yönelik bir çalışma yürüteceğini belirt.\r\n\r\n- Çözümleri analiz formundaki \"Proje Kapsamında Yapılacak Çalışmalar\" ve iş paketlerinden türet. \"Çözüm 1\"/\"Problem 1\" gibi ifadeler kullanma; başlıkları doğrudan yapılacak işe göre yaz.\r\n- Olası başlık yapısı (gerekirse farklı/ek başlık kullanılabilir):\r\n  - **Su Verimliliği Farkındalık Eğitimi ve Yönetim Ekibinin Kurulması** (eğitim, çalışan farkındalığı, su verimliliği yönetim ekibi, görev tanımları)\r\n  - **Mevcut Durum Veri Formunun Hazırlanması** (mevcut değerler, su kullanımı, izleme yapısının forma aktarılması)\r\n  - **Sektörel Kılavuzların İncelenmesi ve Başvuru Formunun Hazırlanması**\r\n  - **Performans Hedeflerinin Belirlenmesi ve İzleme Yapısı** (hedef oluşturma, izleme, gerektiğinde form revizyonu)\r\n- Son paragrafta bu çözümlerin şirkete sağlayacağı kurumsal kazanımları özetle. Ürün/makine/kapasite detayı verme.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 5,
+          "title": "Projenin Hedefleri",
+          "prompt_body": "### Projenin Hedefleri\nProje sonunda ulaşılmak istenen seviyeyi anlat (iş paketlerinin tekrarı değil; faaliyetleri ay ay anlatma).\r\n\r\n- Bütünsel yapı, en az **3-4 hedef başlığı**. \"Hedef 1\" gibi başlık kullanma. Gerçekçi, uygulanabilir ve proje kapsamıyla sınırlı.\r\n- Şirket tarihçesi, ürün detayı veya proje adını tekrar etme.\r\n- Olası başlıklar (gerekirse farklı/ek): Su Verimliliği Yönetim Kapasitesinin Geliştirilmesi; Mavi Sertifika Başvurusu için Hazırlık Seviyesinin Oluşturulması; Mevcut Değerlerin İzlenebilir Kılınması; Performans Hedefleri ve Sürekli İyileştirme Yapısının Kurulması.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 6,
+          "title": "Yöntem",
+          "prompt_body": "### Yöntem\nİlk paragrafta, hedeflere ulaşmak için eğitim, mevcut durum analizi, sektörel kılavuz incelemesi, form hazırlama, performans hedefleri ve izleme sistemi bileşenlerinden oluşan bir metodoloji uygulanacağını belirt.\r\n\r\n- **ISO 14064-1, GHG Protocol, Kapsam, emisyon faktörü, karbon ayak izi, sera gazı envanteri ifadeleri kullanma.** Teknik metodoloji su verimliliği mevzuatı, Mavi Sertifika başvuru yapısı, Mevcut Durum Veri Formu ve sektörel kılavuzlar etrafında kurulsun.\r\n- Olası yöntem başlıkları (gerekirse farklı/ek):\r\n  - **Eğitim ve Kurumsal Görevlendirme Yöntemi**\r\n  - **Mevcut Durum Veri Formu Hazırlama Yöntemi**\r\n  - **Sektörel Kılavuz ve Başvuru Formu Uyumlama Yöntemi**\r\n  - **Performans Hedefi Belirleme ve İzleme Yöntemi**\r\n- Yalnızca proje metodolojisine odaklan; şirket tarihçesi ve ürün detayı açıklama.",
+          "max_chars": null,
+          "target_words": 2000
+        },
+        {
+          "number": 7,
+          "title": "İş Planı",
+          "prompt_body": "### İş Planı\nİş planının ilk cümlesi şu biçimde olsun: \"**[Proje Adı]: 4 Aylık Program**\". İş planı yalnızca su verimliliği ve Mavi Sertifika hazırlık süreciyle sınırlı olsun. **Karbon ayak izi, emisyon faktörü, sera gazı envanteri, karbon ayak izi raporu gibi çıktılar kullanma.**\r\n\r\nHer iş paketinde 2 bölüm: **Faaliyetler** (birkaç kısa, net cümle) ve **Çıktı** (iş paketi sonunda elde edilecek belge/somut çıktının adı). Analiz formunda farklı süre/çıktı verilmişse onu esas al. Önerilen 4 iş paketi:\r\n\r\n- **İş Paketi 1 - Ay 1 - Proje Başlangıcı, Su Verimliliği Eğitimi ve Yönetim Ekibinin Kurulması** → Çıktı: Su Verimliliği Eğitim Sunumu ve Su Verimliliği Yönetim Ekibi Görev Tanımları\r\n- **İş Paketi 2 - Ay 2 - Sektörel Kılavuzların İncelenmesi ve Mevcut Durum Veri Formunun Hazırlanması** → Çıktı: Mevcut Durum Veri Formu\r\n- **İş Paketi 3 - Ay 3 - Performans Hedeflerinin Belirlenmesi ve Başvuru Formunun Hazırlanması** → Çıktı: Başvuru Formu\r\n- **İş Paketi 4 - Ay 4 - Nihai Başvuru Dosyası, İzleme Sistemi ve Form Revizyon Eğitimi** → Çıktı: Su Verimliliği Performans Hedefi İzleme Tablosu",
+          "max_chars": null,
+          "target_words": null
+        },
+        {
+          "number": 8,
+          "title": "Proje Yönetimi ve Organizasyonu",
+          "prompt_body": "### Proje Yönetimi ve Organizasyonu\n**Üç** kurumsal paragraf yaz (iş paketlerini tek tek tekrar etme; ürün/makine/kapasite bilgisi kullanma):\r\n- Proje iletişim yapısı, mentör ile şirket ekibi arasında görev dağılımı, toplantı takvimi ve sorumlulukların netleştirilmesi.\r\n- Eğitim, veri toplama, form hazırlama ve revizyon süreçlerinde geri bildirim mekanizmasının işleyişi; eksik/ tutarsız veri ve revizyon ihtiyaçlarının şirket ekibiyle birlikte tamamlanması.\r\n- Proje sonunda elde edilen çıktıların kurum içinde sahiplenilmesi, sürecin su verimliliği yönetim ekibiyle sürdürülmesi ve performans hedeflerinin düzenli izlenmesi.\r\n\r\nDil ikna edici, kurumsal ve proje yönetimi terminolojisiyle uyumlu olsun.",
+          "max_chars": null,
+          "target_words": 750
+        },
+        {
+          "number": 9,
+          "title": "Kuruluşun Ar-Ge Olanakları / Şirket Altyapısı",
+          "prompt_body": "### Kuruluşun Ar-Ge Olanakları / Şirket Altyapısı\nŞirketin proje yürütme kapasitesini analiz formundaki bilgilere dayanarak açıkla; hayali bilgi üretme. Aşağıdaki başlıkları **aynen** kullan, her başlık **kalın** ve iki nokta ile; her başlık altında 3-4 cümlelik tek paragraf.\r\n\r\n**a. Çağrı Konusuyla İlgili Deneyim:** çevre yönetimi, yeşil dönüşüm, kaynak verimliliği, kalite, çevre veya enerji verimliliği alanındaki mevcut çalışmalar; benzer çalışma yapıldıysa formdaki sınırlarda.\r\n**b. Proje Yönetim Kapasitesi ve Deneyimi:** önceki projeler, yatırım süreçleri, yönetim sistemleri, müşteri projeleri veya kurumsal uygulamalar.\r\n**c. Ulusal ve Uluslararası İşbirliği Deneyimi:** formda yer alıyorsa ulusal/uluslararası müşteri, tedarikçi, proje, ihracat, işbirliği veya sektörel ağ bilgisi.\r\n**d. Personel Yetkinliği:** insan kaynağı yapısı, teknik personel, idari/üretim ekibi, genç ve kadın çalışan bilgisi (formdaki kadarıyla); projeye veri ve uygulama desteği verebilecek kapasiteyi vurgula.\r\n**e. Fiziki Altyapı:** üretim alanı, tesis, şube, fabrika yapısı veya fiziki kapasite (formdaki kadarıyla; bilgi yoksa tahmini ifade kullanma).\r\n**f. Sermaye Altyapısı:** yatırım kapasitesi, önceki yatırımlar veya finansal güç (formdaki kadarıyla); proje sonrası su/kaynak verimliliği yatırımlarını değerlendirebilecek kurumsal kapasite makul biçimde belirtilebilir.",
+          "max_chars": null,
+          "target_words": 500
+        },
+        {
+          "number": 10,
+          "title": "Proje Sonuçları",
+          "prompt_body": "### Proje Sonuçları\nProje sonuçları, iş paketi çıktıları değil; şirketin proje sonunda elde edeceği kurumsal kazanımlardır. Kısa, bütünsel ve profesyonel; madde işareti kullanma; ürün/makine/şirket detayı verme. **emisyon yönetimi, karbon raporlama, sera gazı, karbon ayak izi ifadeleri kullanma.**\r\n\r\nVurgula: su verimliliği yönetim kapasitesinin gelişmesi; Mavi Sertifika başvurusuna hazır belge yapısı; mevcut su kullanımı değerlerinin izlenebilir kılınması; performans hedeflerinin belirlenmesi ve izlenmesi; çalışan farkındalığı ve kurumsal sahiplenme; kaynak verimliliği ve sürdürülebilirlik performansına katkı. Tek, akıcı, kompakt metin.",
+          "max_chars": null,
+          "target_words": 750
+        },
+        {
+          "number": 11,
+          "title": "Beklenen Etki",
+          "prompt_body": "### Beklenen Etki\nProjenin şirket üzerindeki beklenen etkileri. En fazla **3-4 başlık**, her biri tek paragraf; sonunda tüm etkileri sürdürülebilirlik yaklaşımıyla ilişkilendiren **3 cümlelik** özet paragrafı.\r\n\r\nOlası başlıklar (gerekirse farklı/ek):\r\n- Kaynak Verimliliği ve Su Yönetimi Etkisi\r\n- Kurumsal Kapasite ve Yönetim Etkisi\r\n- Mevzuata Uyum ve Başvuru Hazırlığı Etkisi\r\n- Çevresel Sürdürülebilirlik ve Paydaş Beklentileri Etkisi\r\n\r\n**Karbon/emisyon ifadeleri kullanma.** Şirketin ürünleri/makineleri hakkında bilgi kullanma.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 12,
+          "title": "Yaygın Etki",
+          "prompt_body": "### Yaygın Etki\nProjenin şirket dışına taşan, daha geniş ve uzun vadeli etkileri: sektör, ülke ve sürdürülebilirlik ekosistemi.\r\n\r\n- Başlıkları **numaralandır**; her biri tek paragraf; ürün/makine detayı kullanma; beklenen etkiyi tekrar etme.\r\n- Olası başlıklar (gerekirse farklı/ek):\r\n  1. Sektörel Su Verimliliği Kültürüne Katkı\r\n  2. Kaynak Verimliliği Yaklaşımının Yaygınlaşması\r\n  3. Ulusal Su Verimliliği Hedeflerine Katkı\r\n  4. Sürdürülebilir Üretim ve Yeşil Dönüşüm Ekosistemine Katkı\r\n- Uzun vadede sürdürülebilir üretim, çevresel performans yönetimi ve yeşil dönüşüm uygulamalarının yaygınlaşmasına katkıyı vurgula. **Karbon/emisyon dili kullanma.**",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 13,
+          "title": "Proje Sonrası Sürdürülebilirlik Stratejileri",
+          "prompt_body": "### Proje Sonrası Sürdürülebilirlik Stratejileri\nProje tamamlandıktan sonra kazanımların nasıl sürdürüleceğini anlat. Başlıkları **numaralandır**; madde işareti kullanma; her başlığın açıklaması düz metin olarak altında; sonunda özet paragrafı.\r\n\r\n- **\"Gelecek yıllarda karbon ayak izi hesaplamalarının tekrarlanması\" gibi ifadeler kullanma.** Odak: Mavi Sertifika, su verimliliği, mevcut değerlerin izlenmesi, performans hedeflerinin takibi, form revizyonu, çalışan farkındalığı ve yeni iyileştirme fırsatları.\r\n- Olası başlıklar (gerekirse farklı/ek): Su Verimliliği Verilerinin Düzenli İzlenmesi; Performans Hedeflerinin Gözden Geçirilmesi; Formların Güncellenmesi ve Kurumsal Sahiplenme; Farkındalık ve Eğitim Faaliyetlerinin Sürdürülmesi; Yeni İyileştirme Fırsatlarının Değerlendirilmesi.\r\n- Özet: bu stratejilerin Mavi Sertifika sonrası su verimliliği yönetimini aktif tutacağını ve çevresel performansı iyileştireceğini belirt.",
+          "max_chars": null,
+          "target_words": 1000
+        }
+      ]
+    },
+    {
+      "slug": "water-carbon",
+      "label_tr": "Su Verimliliği + Kurumsal Karbon",
+      "label_en": "Water Efficiency + Corporate Carbon",
+      "desc_tr": "Su Verimliliği / Mavi Sertifika + 2025 Kurumsal Karbon Ayak İzi (birleşik)",
+      "desc_en": "Water Efficiency / Blue Certificate + 2025 Corporate Carbon Footprint (combined)",
+      "months": 4,
+      "work_packages": 4,
+      "question_count": 13,
+      "scope_text": "Bu proje **iki ana bileşenden** oluşur:\r\n1. **Su Verimliliği / Mavi Sertifika** hazırlık çalışmaları\r\n2. **2025 Kurumsal Karbon Ayak İzi** hesaplama, raporlama ve yeşil dönüşüm yol haritası çalışmaları\r\n\r\nSu verimliliği tarafı: su verimliliği farkındalık eğitimi, su verimliliği yönetim ekibi görev tanımları, Mevcut Durum Veri Formu, sektörel kılavuz incelemesi, Mavi Sertifika başvuru formu, mevcut değerlerin belirlenmesi, performans hedefleri ve Su Verimliliği Performans Hedefi İzleme Tablosu.\r\n\r\nKurumsal karbon tarafı: kurumsal karbon ayak izi farkındalık eğitimi, veri sahiplerinin belirlenmesi, faaliyet verisi toplama, **TS EN ISO 14064-1:2019** yaklaşımıyla sera gazı envanteri, **Kapsam 1, Kapsam 2 ve uygun Kapsam 3** emisyon kaynaklarının değerlendirilmesi, emisyon hesaplamaları, 2025 Kurumsal Karbon Ayak İzi Raporu ve Yeşil Dönüşüm Yol Haritası.\r\n\r\nKurallar:\r\n- Yalnızca analiz formundaki bilgileri kullan; sayısal veri, kapasite, yatırım, makine, müşteri, sertifika, ihracat uydurma.\r\n- Şirket Su Verimliliği Yönetmeliği kapsamındaysa açıkça kullan; gönüllü ise zorunluluk dili değil kurumsal hazırlık/kaynak verimliliği/sürdürülebilirlik/rekabetçilik dili kullan; varsayım yapma.\r\n- Karbon ayak izi sonucu hesaplanmadan sayısal azaltım hedefi yazma.\r\n- Her yanıt iki bileşeni de uygun biçimde içersin ve ilgili sorunun amacına göre hazırlansın.",
+      "sort": 3,
+      "work_package_body": "Aşağıdaki iş paketi yapısını referans al; yapıyı, paket sayısını ve çıktıları koru, sözcükleri aynen kopyalamadan firmaya göre paraflayarak detaylandır. Toplam süre: 4 ay. İş plan hem Su Verimliliği / Mavi Sertifika hem de 2025 Kurumsal Karbon Ayak İzi çalışmalarını kapsar.\n\n**İş Paketi 1 — 1. Ay — Proje Başlangıcı, Farkındalık Eğitimleri ve Mevcut Durum Veri Formu Çalışmaları**\n- Faaliyetler: Proje başlangıç toplantısı; su verimliliği ve kurumsal karbon ayak izi farkındalık eğitimlerinin ayrı oturumlar halinde yapılması; su verimliliği yönetim ekibi görev tanımlarının hazırlanması; karbon ayak izi veri toplama sürecinde görev alacak firma içi sorumluların belirlenmesi; Mevcut Durum Veri Formu çalışmalarının başlatılması ve mevcut değerlerin form altyapısına aktarılması.\n- Çıktı: Su Verimliliği Eğitimi Sunumu; Kurumsal Karbon Ayak İzi Eğitimi Sunumu; Su Verimliliği Yönetim Ekibi Görev Tanımları; Mevcut Durum Veri Formu\n\n**İş Paketi 2 — 2. Ay — Su Verimliliği Başvuru Formunun Hazırlanması ve Karbon Ayak İzi Veri Toplama Sürecinin Başlatılması**\n- Faaliyetler: Sektör kılavuzları ve sektörel iyi uygulama başlıklarının incelenmesi; Mevcut Durum Veri Formu değerlerinin sektör kılavuzlarıyla ilişkilendirilmesi; su verimliliği performans hedefleri ve iyileştirme faaliyetlerinin başvuru formuna uygun hazırlanması; firma ekibine takip ve revizyonun aktarılması; kurumsal karbon ayak izi için enerji, yakıt, hammadde, lojistik, atık, hizmet alımı vb. faaliyet verilerinin toplanmasına başlanması.\n- Çıktı: Mavi Belge Başvuru Formu; Kurumsal Karbon Ayak İzi Faaliyet Verileri Tablosu\n\n**İş Paketi 3 — 3. Ay — Karbon Ayak İzi Veri Toplamanın Tamamlanması ve Hesaplamaların Başlatılması**\n- Faaliyetler: Firma tarafından toplanan 2025 faaliyet verilerinin mentor tarafından kontrolü; verilerin doğrudan, enerji dolaylı ve diğer dolaylı emisyonlar kapsamında sınıflandırılması; TS EN ISO 14064-1:2019 yaklaşımıyla kurumsal sera gazı envanterinin oluşturulması; uygun emisyon faktörlerinin belirlenip hesaplama tablolarının hazırlanması; 2025 hesaplamalarına başlanması.\n- Çıktı: Emisyon Hesaplama Tablosu\n\n**İş Paketi 4 — 4. Ay — Hesaplamaların Tamamlanması, Raporlama ve Yol Haritasının Hazırlanması**\n- Faaliyetler: 2025 kurumsal karbon ayak izi hesaplamalarının tamamlanması; sonuçların kapsamlar, faaliyet alanları ve yoğun emisyon kaynakları bazında değerlendirilmesi; sonuçların TS EN ISO 14064-1:2019 uyumlu rapor formatına dönüştürülmesi; iyileştirme ihtiyacı bulunan süreçlerin belirlenmesi; su verimliliği hedefleriyle birlikte değerlendirilerek yeşil dönüşüm yol haritasının hazırlanması.\n- Çıktı: 2025 Yılı Kurumsal Karbon Ayak İzi Raporu; Yeşil Dönüşüm Yol Haritası",
+      "sections": [
+        {
+          "number": 1,
+          "title": "Projenin Kısa Tanıtımı",
+          "prompt_body": "### Projenin Kısa Tanıtımı\nAnaliz formundaki şirket için Su Verimliliği / Mavi Sertifika ve Kurumsal Karbon Ayak İzi projesinin amacını doğrudan vurgula; projenin ne amaçladığını, hangi ana faaliyetlerin yürütüleceğini ve sonunda elde edilecek kazanımları açıkla.\r\n- Başlıksız, **4 kısa paragraf**. \"Şirketimiz / (Şirket Adı) olarak / bu proje ile\" dili kullan.\r\n- Bilgiyi analiz formundaki \"Proje Kapsamı\" ve \"Projeye İhtiyaç Nedenleri\" bölümlerinden al. Ürün/faaliyet alanı yalnızca gerekliyse kısaca anılsın.\r\n- Genel proje yönetimi anlatıları, şirket tarihçesi, su verimliliği veya karbon ayak izinin ders kitabı tanımlarını kullanma.\r\n- Şirket Su Verimliliği Yönetmeliği kapsamında ise (formda varsa) kullan; yoksa varsayım yapma.",
+          "max_chars": 1500,
+          "target_words": null
+        },
+        {
+          "number": 2,
+          "title": "Projenin Çağrı ile İlişkisi",
+          "prompt_body": "### Projenin Çağrı ile İlişkisi\nGiriş paragrafında, şirketin hem su verimliliği hem kurumsal karbon ayak izi çalışmasının KOBİ'lerin yeşil dönüşüm ve sürdürülebilirlik kapasitesini artırma amacıyla uyumlu olduğunu açıkla.\r\n\r\nAna başlık: **Projenin Çağrı ile İlişkisi**. Aşağıdaki 3 alt başlığı **aynen** kullan:\r\n1. **Yeşil Dönüşüm ve Sürdürülebilirlik Hedefleri ile İlişki** — su verimliliği yönetimini güçlendirme, Mavi Sertifika sürecine hazırlanma ve kurumsal karbon ayak izini hesaplayarak çevresel performansı izlenebilir kılma.\r\n2. **Teknik Danışmanlık ve Kapasite Geliştirme ile İlişki** — Su Verimliliği Yönetmeliği, Mavi Sertifika başvuru belgeleri, TS EN ISO 14064-1:2019, faaliyet verisi toplama, emisyon hesaplama ve raporlama konusunda teknik kapasite.\r\n3. **Çözüm Yaklaşımları ve Yol Haritası Hazırlığı ile İlişki** — su verimliliği performans hedeflerinin oluşturulması, karbon ayak izi sonuçlarının analizi ve yeşil dönüşüm yol haritasının hazırlanması.\r\n\r\nSonunda kısa özet paragrafı yaz.",
+          "max_chars": null,
+          "target_words": 1000
+        },
+        {
+          "number": 3,
+          "title": "Problem Tanımı",
+          "prompt_body": "### Problem Tanımı\nAnaliz formundaki \"Projeye İhtiyaç Nedenleri\"ni esas al. Metin; Su Verimliliği Yönetmeliği kapsamı veya gönüllü Mavi Sertifika hazırlığı, mevcut su kullanımı verisinin sistematikleştirilmesi, performans hedefleri, kurumsal karbon ayak izi verisinin toplanması, sera gazı emisyonlarının hesaplanması ve yeşil dönüşüm yol haritası ihtiyacı gibi nedenlere dayansın.\r\n\r\n- Şirket yönetmelik kapsamındaysa açıkça kullan; gönüllü ise zorunluluk dili kullanma; varsayım yapma.\r\n- Her başlık altında 5-6 cümle. \"Problem 1\" gibi başlık kullanma.\r\n- Proje adı, ürün detayı, kapasite, makine parkı ve şirket tarihçesi yer almasın.\r\n- Olası başlıklar (gerekirse farklı/ek): Su Verimliliği Yönetimi ve Mavi Sertifika Hazırlık İhtiyacı; Mevcut Su Kullanımı Verisinin Sistematikleştirilmesi; Kurumsal Karbon Ayak İzi Verisinin Ölçülebilir Kılınması; Performans Hedefleri, Raporlama ve Yeşil Dönüşüm Yol Haritası İhtiyacı; Çalışan Farkındalığı ve Kurumsal Sorumlulukların Netleştirilmesi.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 4,
+          "title": "Çözüm Önerisi",
+          "prompt_body": "### Çözüm Önerisi\nİlk paragrafta, şirketin proje kapsamında su verimliliği yönetimini güçlendirmek, Mavi Sertifika başvuru hazırlıklarını tamamlamak, 2025 kurumsal karbon ayak izini hesaplamak ve yeşil dönüşüm yol haritası oluşturmak için **bütünleşik** bir çalışma yürüteceğini belirt.\r\n\r\n- Çözümleri analiz formundaki \"Proje Kapsamında Yapılacak Çalışmalar\" ve iş paketlerinden türet. \"Çözüm 1\"/\"Problem 1\" gibi ifadeler kullanma.\r\n- Olası başlık yapısı (gerekirse farklı/ek):\r\n  - **Su Verimliliği ve Karbon Ayak İzi Farkındalık Eğitimleri** (iki ayrı eğitim, görev dağılımı, kurumsal farkındalık)\r\n  - **Su Verimliliği Yönetim Ekibi ve Mevcut Durum Veri Formu Çalışmaları**\r\n  - **Sektörel Kılavuzlar, Başvuru Formu ve Performans Hedefleri**\r\n  - **Kurumsal Karbon Ayak İzi Veri Toplama ve Hesaplama Süreci** (2025 faaliyet verisi, Kapsam 1/2 ve uygun Kapsam 3, emisyon hesaplamaları)\r\n  - **Raporlama ve Yeşil Dönüşüm Yol Haritası**\r\n- Son paragrafta çözümlerin sağlayacağı kurumsal kazanımları özetle. Ürün/makine/kapasite detayı gereksiz yere ekleme.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 5,
+          "title": "Projenin Hedefleri",
+          "prompt_body": "### Projenin Hedefleri\nProje sonunda su verimliliği ve karbon yönetimi açısından ulaşılmak istenen seviyeyi anlat (iş paketlerinin tekrarı değil; ay ay faaliyet anlatma).\r\n\r\n- Bütünleşik yapı, en az **4 hedef başlığı**. \"Hedef 1\" gibi başlık kullanma. Gerçekçi, uygulanabilir, proje kapsamıyla sınırlı.\r\n- Şirket tarihçesi, ürün detayı veya proje adını tekrar etme.\r\n- Olası başlıklar (gerekirse farklı/ek): Su Verimliliği Yönetim Kapasitesinin Geliştirilmesi; Mavi Sertifika Başvurusu için Hazırlık Seviyesinin Oluşturulması; Kurumsal Karbon Ayak İzi Ölçme ve Raporlama Yetkinliğinin Kazanılması; Mevcut Değerlerin ve Emisyon Kaynaklarının İzlenebilir Kılınması; Yeşil Dönüşüm Yol Haritasının Oluşturulması.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 6,
+          "title": "Yöntem",
+          "prompt_body": "### Yöntem\nİlk paragrafta, hedeflere ulaşmak için eğitim, mevcut durum analizi, sektörel kılavuz incelemesi, form hazırlama, performans hedefleri, faaliyet verisi toplama, sera gazı hesaplama, raporlama ve yol haritası bileşenlerinden oluşan bir yöntem uygulanacağını belirt.\r\n\r\nOlası yöntem başlıkları (gerekirse farklı/ek):\r\n- **Eğitim ve Kurumsal Görevlendirme Yöntemi** (su verimliliği ve kurumsal karbon için ayrı farkındalık eğitimleri; su verimliliği yönetim ekibi ve karbon veri sahiplerinin belirlenmesi)\r\n- **Mevcut Durum Veri Formu ve Mavi Sertifika Hazırlık Yöntemi**\r\n- **Sektörel Kılavuz, Başvuru Formu ve Performans Hedefi Yöntemi**\r\n- **Kurumsal Karbon Ayak İzi Veri Toplama Yöntemi** (elektrik, yakıt, hammadde, yardımcı malzeme, atık, lojistik, hizmet alımı; eksik/tutarsız veri mentör kontrolüyle tamamlanır)\r\n- **Sera Gazı Envanteri ve Emisyon Hesaplama Yöntemi** (TS EN ISO 14064-1:2019; doğrudan, enerji dolaylı, diğer dolaylı emisyonlar; uygun emisyon faktörleriyle 2025 hesaplaması)\r\n- **Raporlama ve Yeşil Dönüşüm Yol Haritası Yöntemi** (su verimliliği hedefleri ile karbon azaltım başlıklarının birlikte değerlendirilmesi)\r\n\r\nYalnızca proje yöntemine odaklan; şirket geçmişi ve ürün detayı açıklama.",
+          "max_chars": null,
+          "target_words": 2000
+        },
+        {
+          "number": 7,
+          "title": "İş Planı",
+          "prompt_body": "### İş Planı\nİş planının ilk cümlesi: \"**[Proje Adı]: [Analiz formundaki süre]-Aylık Program**\". Formda süre yoksa **4 aylık hızlandırılmış program**ı esas al. İş planı hem Su Verimliliği / Mavi Sertifika hem 2025 Kurumsal Karbon Ayak İzi çalışmalarını içersin.\r\n\r\nHer iş paketinde 2 bölüm: **Faaliyetler** (birkaç kısa, net cümle) ve **Çıktı** (belge/somut çıktının adı). Formda farklı süre/iş paketi/çıktı varsa onu esas al. Önerilen 4 iş paketi:\r\n\r\n- **İş Paketi 1 - Ay 1 - Proje Başlangıcı, Farkındalık Eğitimleri ve Mevcut Durum Veri Formu Çalışmaları** → Çıktı: Su Verimliliği Eğitim Sunumu, Kurumsal Karbon Ayak İzi Eğitim Sunumu, Su Verimliliği Yönetim Ekibi Görev Tanımları, Taslak Mevcut Durum Veri Formu\r\n- **İş Paketi 2 - Ay 2 - Mavi Sertifika Başvuru Hazırlığı ve Karbon Ayak İzi Veri Toplama Sürecinin Başlatılması** → Çıktı: Mavi Sertifika Başvuru Formu, Nihai Mevcut Durum Veri Formu, Su Verimliliği Performans Hedefi İzleme Tablosu, Kurumsal Karbon Ayak İzi Veri Talep Listesi\r\n- **İş Paketi 3 - Ay 3 - Karbon Ayak İzi Veri Toplama Sürecinin Tamamlanması ve Hesaplamaların Başlatılması** → Çıktı: Kurumsal Sera Gazı Veri Envanteri, Eksik Veri ve Kanıt Belge Listesi, Emisyon Kaynakları Sınıflandırma Tablosu, Emisyon Hesaplama Tabloları\r\n- **İş Paketi 4 - Ay 4 - Karbon Ayak İzi Hesaplamalarının Tamamlanması, Raporlama ve Yol Haritası** → Çıktı: 2025 Kurumsal Karbon Ayak İzi Raporu ve Yeşil Dönüşüm Yol Haritası",
+          "max_chars": null,
+          "target_words": null
+        },
+        {
+          "number": 8,
+          "title": "Proje Yönetimi ve Organizasyonu",
+          "prompt_body": "### Proje Yönetimi ve Organizasyonu\n**Üç** kurumsal paragraf yaz (iş paketlerini tek tek tekrar etme; ürün/makine/kapasite bilgisi kullanma):\r\n- Proje iletişim yapısı, mentör ile şirket ekibi arasında görev dağılımı, toplantı takvimi, su verimliliği yönetim ekibi ve karbon ayak izi veri sahiplerinin rolleri.\r\n- Eğitim, veri toplama, form hazırlama, karbon ayak izi hesaplama ve raporlama süreçlerinde geri bildirim mekanizması; eksik/tutarsız veri ve revizyon ihtiyaçlarının şirket ekibiyle tamamlanması.\r\n- Çıktıların kurum içinde sahiplenilmesi, su verimliliği hedeflerinin izlenmesi, karbon ayak izi verisinin sonraki yıllarda tekrar kullanılabilecek şekilde düzenlenmesi ve yeşil dönüşüm yol haritasının uygulanabilir rehber olarak kullanılması.\r\n\r\nDil ikna edici, kurumsal ve proje yönetimi terminolojisiyle uyumlu olsun.",
+          "max_chars": null,
+          "target_words": 750
+        },
+        {
+          "number": 9,
+          "title": "Kuruluşun Ar-Ge Olanakları / Şirket Altyapısı",
+          "prompt_body": "### Kuruluşun Ar-Ge Olanakları / Şirket Altyapısı\nŞirketin proje yürütme kapasitesini analiz formundaki bilgilere dayanarak açıkla; hayali bilgi üretme. Aşağıdaki başlıkları **aynen** kullan, her başlık **kalın** ve iki nokta ile; her başlık altında 3-4 cümlelik tek paragraf.\r\n\r\n**a. Çağrı Konusuyla İlgili Deneyim:** çevre yönetimi, yeşil dönüşüm, kaynak verimliliği, kalite, çevre, enerji verimliliği, karbon yönetimi veya sürdürülebilirlik alanındaki mevcut çalışmalar (formdaki sınırlarda).\r\n**b. Proje Yönetim Kapasitesi ve Deneyimi:** önceki projeler, yatırım süreçleri, yönetim sistemleri, müşteri projeleri veya kurumsal uygulamalar.\r\n**c. Ulusal ve Uluslararası İşbirliği Deneyimi:** formda yer alıyorsa müşteri, tedarikçi, proje, ihracat, işbirliği veya sektörel ağ bilgisi.\r\n**d. Personel Yetkinliği:** insan kaynağı yapısı, teknik/idari/üretim ekibi, genç ve kadın çalışan bilgisi (formdaki kadarıyla); projeye veri, form, eğitim, hesaplama ve uygulama desteği verebilecek kapasiteyi vurgula.\r\n**e. Fiziki Altyapı:** üretim alanı, tesis, şube, fabrika yapısı veya fiziki kapasite (formdaki kadarıyla; bilgi yoksa tahmini ifade kullanma).\r\n**f. Sermaye Altyapısı:** yatırım kapasitesi, önceki yatırımlar veya finansal güç (formdaki kadarıyla); proje sonrası su/enerji verimliliği, emisyon azaltımı ve kaynak verimliliği yatırımlarını değerlendirebilecek kurumsal kapasite makul biçimde belirtilebilir.",
+          "max_chars": null,
+          "target_words": 500
+        },
+        {
+          "number": 10,
+          "title": "Proje Sonuçları",
+          "prompt_body": "### Proje Sonuçları\nProje sonuçları, iş paketi çıktıları değil; şirketin proje sonunda elde edeceği kurumsal kazanımlardır. Kısa, bütünleşik ve profesyonel; madde işareti kullanma; ürün/makine/şirket detayı verme. Tek, akıcı, kompakt metin.\r\n\r\nVurgula: su verimliliği yönetim kapasitesinin gelişmesi; Mavi Sertifika başvurusuna hazır belge yapısı; mevcut su kullanımı değerlerinin izlenebilir kılınması; 2025 kurumsal karbon ayak izinin hesaplanması ve raporlanması; emisyon kaynaklarının ve kaynak verimliliği iyileştirme alanlarının belirlenmesi; yeşil dönüşüm yol haritasının oluşturulması; çalışan farkındalığı ve kurumsal sahiplenme.",
+          "max_chars": null,
+          "target_words": 750
+        },
+        {
+          "number": 11,
+          "title": "Beklenen Etki",
+          "prompt_body": "### Beklenen Etki\nProjenin şirket üzerindeki beklenen etkileri. En fazla **4 başlık**, her biri tek paragraf; sonunda tüm etkileri sürdürülebilirlik yaklaşımıyla ilişkilendiren **3 cümlelik** özet paragrafı.\r\n\r\nOlası başlıklar (gerekirse farklı/ek):\r\n- Kaynak Verimliliği ve Su Yönetimi Etkisi\r\n- Karbon Yönetimi ve Çevresel Veri İzleme Etkisi\r\n- Kurumsal Kapasite ve Yönetim Etkisi\r\n- Mevzuata Uyum, Paydaş Beklentileri ve Yeşil Dönüşüm Etkisi (yönetmelik kapsamındaysa Su Verimliliği Yönetmeliği/Mavi Sertifika hazırlığı; karbon raporunun müşteri, kamu, finansman sağlayıcı paydaş beklentilerini karşılama kapasitesi)\r\n\r\nŞirketin ürünleri/makineleri hakkında bilgi kullanma; proje sonuçları bölümünü tekrar etme.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 12,
+          "title": "Yaygın Etki",
+          "prompt_body": "### Yaygın Etki\nProjenin şirket dışına taşan, daha geniş ve uzun vadeli etkileri: sektör, ülke ve sürdürülebilirlik ekosistemi.\r\n\r\n- Başlıkları **numaralandır**; her biri tek paragraf; ürün/makine detayı kullanma; beklenen etkiyi tekrar etme.\r\n- Olası başlıklar (gerekirse farklı/ek):\r\n  1. Sektörel Su Verimliliği ve Karbon Yönetimi Kültürüne Katkı\r\n  2. Sanayide Ölçme, İzleme ve Raporlama Yaklaşımının Yaygınlaşması\r\n  3. Ulusal Su Verimliliği ve Yeşil Dönüşüm Hedeflerine Katkı\r\n  4. Sürdürülebilir Üretim ve Rekabetçilik Ekosistemine Katkı\r\n- Uzun vadede sürdürülebilir üretim, çevresel performans yönetimi, kaynak verimliliği ve yeşil dönüşüm uygulamalarının yaygınlaşmasına katkıyı vurgula.",
+          "max_chars": null,
+          "target_words": 1500
+        },
+        {
+          "number": 13,
+          "title": "Proje Sonrası Sürdürülebilirlik Stratejileri",
+          "prompt_body": "### Proje Sonrası Sürdürülebilirlik Stratejileri\nProje tamamlandıktan sonra kazanımların nasıl sürdürüleceğini anlat. Başlıkları **numaralandır**; madde işareti kullanma; her başlığın açıklaması düz metin olarak altında; sonunda özet paragrafı.\r\n\r\nOdak: Mavi Sertifika, su verimliliği, mevcut değerlerin izlenmesi, performans hedeflerinin takibi, form revizyonu, kurumsal karbon ayak izi verisinin sonraki yıllarda güncellenmesi, yeşil dönüşüm yol haritası ve yeni iyileştirme fırsatları.\r\n\r\nOlası başlıklar (gerekirse farklı/ek):\r\n1. Su Verimliliği Verilerinin Düzenli İzlenmesi\r\n2. Performans Hedeflerinin Gözden Geçirilmesi\r\n3. Kurumsal Karbon Ayak İzi Verilerinin Güncellenmesi\r\n4. Yeşil Dönüşüm Yol Haritasının İzlenmesi\r\n5. Farkındalık ve Eğitim Faaliyetlerinin Sürdürülmesi\r\n6. Yeni İyileştirme ve Yatırım Fırsatlarının Değerlendirilmesi\r\n\r\nÖzet: bu stratejilerin proje sonrası çevresel performans izlemeyi sürdüreceğini, Mavi Sertifika ve karbon yönetimi altyapısını aktif tutacağını ve yeşil dönüşüm sürecini kademeli iyileştireceğini belirt.",
+          "max_chars": null,
+          "target_words": 1000
+        }
+      ]
+    }
+  ]
+}

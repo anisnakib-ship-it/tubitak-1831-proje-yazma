@@ -44,6 +44,46 @@ db.exec(`
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
   );
+
+  -- ============================================================
+  -- BİLGİ (KNOWLEDGE) — eskiden knowledge/ vault + generator.js
+  -- içinde sabit kodlanan her şey artık burada; platform içinden
+  -- düzenlenir. (En son kazanır; sürüm/geçmiş yok.)
+  -- ============================================================
+  CREATE TABLE IF NOT EXISTS programs (
+    id             TEXT PRIMARY KEY,
+    slug           TEXT NOT NULL UNIQUE,   -- proje türü (project_type) ile eşleşir
+    label_tr       TEXT NOT NULL,
+    label_en       TEXT,
+    desc_tr        TEXT,
+    desc_en        TEXT,
+    months         INTEGER NOT NULL DEFAULT 6,
+    work_packages  INTEGER NOT NULL DEFAULT 4,
+    question_count INTEGER NOT NULL DEFAULT 13,
+    scope_text     TEXT,                   -- sistem promptuna eklenen kapsam/kurallar
+    wp_body        TEXT,                   -- varsayılan iş paketleri (Soru 7)
+    sort           INTEGER NOT NULL DEFAULT 0,
+    active         INTEGER NOT NULL DEFAULT 1
+  );
+
+  CREATE TABLE IF NOT EXISTS program_sections (
+    id           TEXT PRIMARY KEY,
+    program_id   TEXT NOT NULL,
+    number       INTEGER NOT NULL,
+    title        TEXT NOT NULL,
+    prompt_body  TEXT,
+    max_chars    INTEGER,                  -- uzunluk sınırı (karakter); null = yok
+    target_words INTEGER,                  -- veya hedef kelime; null = yok
+    FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE CASCADE,
+    UNIQUE (program_id, number)
+  );
+
+  CREATE TABLE IF NOT EXISTS global_rules (
+    id    TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    body  TEXT,
+    sort  INTEGER NOT NULL DEFAULT 0
+  );
 `);
 
 // Migration: mevcut veritabanına project_type sütununu ekle

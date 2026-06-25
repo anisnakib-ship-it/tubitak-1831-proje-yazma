@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { vaultHealth } from '../services/knowledge.js';
+import { knowledgeHealth } from '../services/knowledge.js';
 
 const router = Router();
 
-// Bilgi grafiği sağlık kontrolü — vault doğru kurulmuş mu?
+// Bilgi sağlık kontrolü — programlar/bölümler veritabanında dolu mu?
 router.get('/health', (req, res) => {
   try {
-    res.json(vaultHealth());
+    res.json(knowledgeHealth());
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

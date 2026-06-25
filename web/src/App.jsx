@@ -53,6 +53,7 @@ export default function App() {
         </Link>
 
         <div className="topbar-right">
+          <Link to="/admin" className="btn btn-sm" title="Bilgi Yönetimi">Bilgi Yönetimi</Link>
           {health && (
             <div className="status-pills">
               <Pill ok={health.chatgptProfile} label="ChatGPT" t={t} />

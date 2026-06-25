@@ -46,7 +46,11 @@ export const RECIPIENTS = (process.env.RECIPIENTS || '')
   .map((s) => s.trim())
   .filter(Boolean);
 
-export const VAULT_PATH = path.resolve(
-  SERVER_DIR,
-  process.env.KNOWLEDGE_VAULT_PATH || '../knowledge'
-);
+// Bilgi Yönetimi (/admin) için paylaşılan parola. Boş bırakılırsa koruma KAPALI
+// olur (yerel geliştirme). Üretimde mutlaka server/.env içinde ayarlayın —
+// /admin herkese açık bir URL'de yayınlanır.
+export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+
+// NOT: Bilgi (prompt'lar, kapsam, iş paketleri, ortak kurallar) artık
+// veritabanında yaşar ve Yönetim ekranından düzenlenir; eski `knowledge/`
+// Obsidian vault'u kaldırıldı. İlk tohum: server/knowledge-seed.json.

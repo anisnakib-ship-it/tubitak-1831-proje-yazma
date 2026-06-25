@@ -2,8 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { runConversation } from './chatgpt-web.js';
 import {
-  loadVault, parseIndex, getSectionNote, getScopeNote, getGlobalNotesText, getGuidelineForSection,
-  getWorkPackageNote
+  getProgramBySlug, getSection, listSections, getGlobalRulesText
 } from './knowledge.js';
 import { buildDocRequests } from './docbuilder.js';
 import { createDocument, clearDocument, applyRequests, shareDocument, docUrl } from './google.js';
@@ -114,42 +113,14 @@ function readUploadedFiles(files = []) {
 }
 
 /**
- * Bölüm uzunlukları — TEK kaynak: Google Sheet "CONTENT LENGTS" sekmesi.
- * Tüm 4 program AYNI 13 soruluk iskeleti paylaştığı için uzunluklar soru
- * NUMARASINA göre aynıdır. Soru 7 (İş Planı) hariçtir: uzunluğu kendi iş
- * paketi belgesi belirler, kelime/karakter sınırı uygulanmaz.
+ * Bölüm uzunluk kuralını (KESİN) üretir. Kaynak: bölüm satırındaki
+ * `max_chars` / `target_words` (Yönetim ekranından düzenlenir). Komut/kılavuz
+ * metnindeki diğer uzunluk ifadeleri ("en az X kelime" vb.) KASTEN yok sayılır;
+ * bu blok her sorunun SONUNA eklenir ki son ve bağlayıcı talimat bu olsun.
  */
-const SECTION_LENGTHS = {
-  1: { chars: 1500 },
-  2: { words: 1000 },
-  3: { words: 1500 },
-  4: { words: 1500 },
-  5: { words: 1500 },
-  6: { words: 2000 },
-  7: null, // İş Planı — sınır yok
-  8: { words: 750 },
-  9: { words: 500 },
-  10: { words: 750 },
-  11: { words: 1500 },
-  12: { words: 1500 },
-  13: { words: 1000 }
-};
-
-/**
- * Bölüm uzunluk kuralını (KESİN) üretir. Kaynak yukarıdaki SECTION_LENGTHS
- * (Sheet); istenirse section notunun frontmatter'ındaki `maxChars`/`targetWords`
- * bunu geçersiz kılabilir. Komut/kılavuz metnindeki diğer uzunluk ifadeleri
- * ("en az X kelime" vb.) KASTEN yok sayılır; bu blok her sorunun SONUNA eklenir
- * ki son ve bağlayıcı talimat bu olsun.
- */
-function lengthInstruction(note, number) {
-  const data = note?.data || {};
-  const fmChars = parseInt(data.maxChars, 10);
-  const fmWords = parseInt(data.targetWords, 10);
-  const sheet = SECTION_LENGTHS[number] || null;
-
-  const chars = Number.isFinite(fmChars) ? fmChars : sheet?.chars;
-  const words = Number.isFinite(fmWords) ? fmWords : sheet?.words;
+function lengthInstruction(section) {
+  const chars = section?.max_chars;
+  const words = section?.target_words;
 
   if (Number.isFinite(chars)) {
     return `\n\n=== UZUNLUK KURALI (KESİN) ===\nBu bölüm, boşluklar dâhil EN FAZLA ${chars} karakter olmalıdır. Metindeki/kılavuzdaki diğer tüm uzunluk ifadelerini (kelime/karakter sınırı, "en az", "en fazla", "yaklaşık" vb.) YOK SAY; yalnızca bu kurala uy.`;
@@ -175,20 +146,23 @@ export function buildMessages({ companyName, projectType, analysis = {}, files =
   const wpDocText = readUploadedFiles(wpFiles);
   const fullAnalysis = filesText ? `${analysisText}\n\n${filesText}` : analysisText;
 
-  const vault = loadVault();
-  const index = parseIndex(vault, template.folder);
-  if (!index.indexNote) {
-    throw new Error(`"${template.labelTr}" türü için indeks bulunamadı (knowledge/${template.folder}/00-index.md).`);
+  const program = getProgramBySlug(template.id);
+  if (!program) {
+    throw new Error(`"${projectType}" programı veritabanında bulunamadı.`);
   }
-  const scopeNote = getScopeNote(vault, template.folder);
-  const globalText = getGlobalNotesText(vault);
+  const sections = listSections(program.id);
+  if (sections.length === 0) {
+    throw new Error(`"${template.labelTr}" programı için bölüm tanımı bulunamadı (Yönetim ekranından ekleyin).`);
+  }
+  const scopeText = (program.scope_text || '').trim();
+  const globalText = getGlobalRulesText();
 
   const introMessage = `TÜBİTAK 1831 Yeşil İnovasyon Teknoloji Mentörlüğü Programı kapsamında, aşağıdaki şirket için bir proje başvurusu yazacağız. Sana 13 soru soracağım; her soruyu YALNIZCA sorulan kapsamda, **Türkçe** ve verilen kurallara harfiyen uyarak yanıtla. Başlık/numara ekleme, sadece istenen metni yaz.
 
 === PROJE TÜRÜ ===
 ${template.labelTr} — Süre: ${template.months} ay, ${template.workPackages} iş paketi.
 
-${scopeNote ? `=== TÜR KAPSAMI VE KURALLARI ===\n${scopeNote.body}\n` : ''}
+${scopeText ? `=== TÜR KAPSAMI VE KURALLARI ===\n${scopeText}\n` : ''}
 === ORTAK KURALLAR ===
 ${globalText}
 
@@ -200,13 +174,9 @@ Bu bağlamı okuduğunu kısaca onayla. Ardından soruları tek tek göndereceğ
   const questions = [];
   const count = template.questionCount || 13;
   for (let n = 1; n <= count; n++) {
-    const note = getSectionNote(vault, template.folder, n);
-    const title = note?.title || `Bölüm ${n}`;
-    // Kılavuz metni grafikten derlenir: o türün indeksinde bu bölüme bağlanan
-    // notlar (wikilink) izlenir. Global notlar intro'da olduğu için burada hariç.
-    // İndekste eşleme yoksa birincil section-NN notuna geri düşülür.
-    const graphGuideline = getGuidelineForSection(vault, index, n, { includeGlobal: false }).trim();
-    const guideline = graphGuideline || note?.body || '';
+    const section = getSection(program.id, n);
+    const title = section?.title || `Bölüm ${n}`;
+    const guideline = (section?.prompt_body || '').trim();
     let prompt = `SORU ${n} — ${title}\nAşağıdaki kurallara KESİNLİKLE uyarak bu bölümü Türkçe yaz. Sadece bölüm metnini döndür.\n\n${guideline}`;
 
     // İş Planı sorusu: kullanıcının girdiği iş paketleri tablosunu/çalışmaları doğrudan ve esas alınacak şekilde ekle
@@ -214,8 +184,8 @@ Bu bağlamı okuduğunu kısaca onayla. Ardından soruları tek tek göndereceğ
       const wp = (analysis.workPackages || '').trim();
       const wtbd = (analysis.workToBeDone || '').trim();
       const wpDoc = (wpDocText || '').trim();
-      // Kullanıcı kendi iş paketini girmediyse programın varsayılan iş paketi notunu esas al
-      const wpNote = (getWorkPackageNote(vault, template.folder)?.body || '').trim();
+      // Kullanıcı kendi iş paketini girmediyse programın varsayılan iş paketi metnini esas al
+      const wpNote = (program.wp_body || '').trim();
       if (wp || wtbd || wpDoc) {
         prompt += `\n\n=== KULLANICININ GİRDİĞİ İŞ PAKETLERİ (ÖNCELİKLİ — BUNU ESAS AL) ===`;
         if (wtbd) prompt += `\nProje Kapsamında Yapılacak Çalışmalar:\n${wtbd}`;
@@ -227,8 +197,8 @@ Bu bağlamı okuduğunu kısaca onayla. Ardından soruları tek tek göndereceğ
       }
     }
 
-    // Uzunluk kuralı (Sheet kaynaklı) — her zaman EN SONA eklenir ki bağlayıcı son talimat olsun.
-    prompt += lengthInstruction(note, n);
+    // Uzunluk kuralı (bölüm satırından) — her zaman EN SONA eklenir ki bağlayıcı son talimat olsun.
+    prompt += lengthInstruction(section);
 
     questions.push({ number: n, title, prompt });
   }
