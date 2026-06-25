@@ -61,6 +61,8 @@ export const api = {
   progress: (id) => req(`/api/projects/${id}/progress`),
 
   chatgptLogin: () => req('/api/chatgpt/login', { method: 'POST' }),
+  chatgptSession: () => req('/api/chatgpt/session'),
+  chatgptTest: (message) => req('/api/chatgpt/test', { method: 'POST', body: JSON.stringify(message ? { message } : {}) }),
 
   // --- Bilgi Yönetimi (admin) ---
   adminPrograms: () => adminReq('/api/admin/programs'),
