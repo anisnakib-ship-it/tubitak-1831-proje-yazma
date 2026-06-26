@@ -99,6 +99,17 @@ export default function ProjectDetail() {
     } catch (e) { setError(e.message); }
   }
 
+  // Sadece dokümanı yeniden oluştur (ChatGPT'yi tekrar çalıştırmadan) — kayıtlı yanıtları kullanır
+  async function rebuildDoc() {
+    setError('');
+    try {
+      await api.rebuildDoc(id);
+      setProject((p) => ({ ...p, status: 'generating' }));
+      setProgress({ step: 'document' });
+      startPolling();
+    } catch (e) { setError(e.message); }
+  }
+
   if (!project) return <div className="page"><p className="muted">{t('projects.loading')}</p></div>;
 
   const ptype = project.project_type;
@@ -145,7 +156,16 @@ export default function ProjectDetail() {
           ✓ {t('gen.ready')} <a href={project.doc_url} target="_blank" rel="noreferrer">{t('gen.openGoogleDoc')} →</a>
         </div>
       )}
-      {project.status === 'error' && <div className="alert alert-err">{t('gen.error')}: {project.error_message}</div>}
+      {project.status === 'error' && (
+        <div className="alert alert-err">
+          <span>{t('gen.error')}: {project.error_message}</span>
+          {project.sections?.length > 0 && (
+            <button className="btn btn-sm" style={{ marginLeft: 12 }} onClick={rebuildDoc} disabled={generating}>
+              Dokümanı yeniden oluştur (kayıtlı yanıtlardan)
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="columns">
         <section className="card" onBlurCapture={onBlurCapture}>

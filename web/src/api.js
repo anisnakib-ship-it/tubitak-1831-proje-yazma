@@ -58,6 +58,7 @@ export const api = {
   },
 
   generate: (id) => req(`/api/projects/${id}/generate`, { method: 'POST' }),
+  rebuildDoc: (id) => req(`/api/projects/${id}/rebuild-doc`, { method: 'POST' }),
   progress: (id) => req(`/api/projects/${id}/progress`),
 
   chatgptLogin: () => req('/api/chatgpt/login', { method: 'POST' }),

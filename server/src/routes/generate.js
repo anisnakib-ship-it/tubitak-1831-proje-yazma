@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { Projects, Files, Sections } from '../db.js';
 import { generateAnswers, buildProjectDoc } from '../services/generator.js';
+import { getTemplate, DEFAULT_TEMPLATE_ID } from '../templates.js';
 import { sendSuccessEmail, sendErrorEmail } from '../services/email.js';
 import { setProgress, getProgress, clearProgress } from '../progress.js';
 
@@ -55,6 +56,50 @@ router.post('/:id/generate', (req, res) => {
       Projects.update(project.id, { status: 'error', error_message: err.message });
       setProgress(project.id, { status: 'error', step: 'error', message: err.message });
       try { await sendErrorEmail(companyName, err); } catch { /* yok say */ }
+    }
+  })();
+});
+
+// Sadece DOKÜMANI yeniden oluştur — ChatGPT'yi TEKRAR ÇALIŞTIRMADAN, daha önce
+// üretilip kaydedilmiş 13 bölüm yanıtını kullanır. Google adımı (ör. DNS / token)
+// başarısız olduğunda tüm üretimi tekrarlamadan dokümanı tamamlamak için.
+router.post('/:id/rebuild-doc', (req, res) => {
+  const project = Projects.get(req.params.id);
+  if (!project) return res.status(404).json({ error: 'Proje bulunamadı.' });
+  if (project.status === 'generating') {
+    return res.status(409).json({ error: 'Bu proje için üretim zaten sürüyor.' });
+  }
+
+  const sections = Sections.listByProject(project.id);
+  if (!sections.length) {
+    return res.status(400).json({ error: 'Kaydedilmiş bölüm yok; önce üretimi çalıştırın.' });
+  }
+
+  const template = getTemplate(project.project_type) || getTemplate(DEFAULT_TEMPLATE_ID);
+  const companyName = project.company_name || project.analysis?.companyName || project.name;
+
+  Projects.update(project.id, { status: 'generating', error_message: null });
+  setProgress(project.id, { status: 'generating', step: 'document', message: 'Doküman yeniden oluşturuluyor (kayıtlı yanıtlardan)...' });
+  res.status(202).json({ status: 'generating' });
+
+  (async () => {
+    try {
+      const answers = sections.map((s) => ({ number: s.number, title: s.title, content: s.content }));
+      const { docId, url } = await buildProjectDoc({
+        companyName, template, answers,
+        onProgress: (p) => setProgress(project.id, { status: 'generating', ...p })
+      });
+      Projects.update(project.id, { status: 'done', doc_url: url });
+      setProgress(project.id, { status: 'done', step: 'done', message: 'Tamamlandı', url });
+      try {
+        setProgress(project.id, { status: 'done', step: 'email', message: 'E-posta gönderiliyor...', url });
+        await sendSuccessEmail(companyName, docId);
+      } catch (mailErr) {
+        setProgress(project.id, { status: 'done', step: 'email-failed', message: 'E-posta gönderilemedi: ' + mailErr.message, url });
+      }
+    } catch (err) {
+      Projects.update(project.id, { status: 'error', error_message: err.message });
+      setProgress(project.id, { status: 'error', step: 'error', message: err.message });
     }
   })();
 });
