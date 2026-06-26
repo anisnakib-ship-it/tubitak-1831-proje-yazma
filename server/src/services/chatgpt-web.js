@@ -142,26 +142,45 @@ async function fillComposer(page, text) {
     await page.keyboard.press('Delete');
   };
 
-  // 1) Pano ile yapıştır — ProseMirror satır sonlarını/yapıyı korur,
-  //    yazma kurallarını (input rules) tetiklemez.
+  // 1) insertText — TÜM metni tek atomik olayda ekler. OS panosuna bağımlı
+  //    DEĞİLDİR (Xvfb'de pano güvenilmez), karakter karakter yazmadığı için
+  //    uzun prompt'ta "yarıda kesilme" olmaz ve ProseMirror markdown/giriş
+  //    kurallarını tetiklemez. İmza karşılaştırması boşluk/satır sonu yok saydığı
+  //    için yapısal farklar yanlış hataya yol açmaz.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await clearComposer();
+    await composer.click();
+    await page.keyboard.insertText(text);
+    await sleep(250);
+    if (await verify()) return;
+  }
+
+  // 2) Yedek: OS panosu ile yapıştır
   try {
     await clearComposer();
     await page.evaluate((t) => navigator.clipboard.writeText(t), text);
     await composer.click();
     await page.keyboard.press('Control+V');
-    await sleep(250);
+    await sleep(300);
     if (await verify()) return;
-  } catch { /* yedek yönteme geç */ }
+  } catch { /* sonraki yönteme geç */ }
 
-  // 2) Yedek: satır satır yaz (satır araları Shift+Enter ile korunur)
-  await clearComposer();
-  const lines = text.split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    if (i > 0) await page.keyboard.press('Shift+Enter');
-    if (lines[i]) await page.keyboard.type(lines[i]);
-  }
-  await sleep(250);
-  if (await verify()) return;
+  // 3) Son yedek: sentetik "paste" olayı — OS panosu gerekmez, metni doğrudan
+  //    ProseMirror'ın paste işleyicisine DataTransfer ile verir.
+  try {
+    await clearComposer();
+    await composer.click();
+    await page.evaluate(({ sel, t }) => {
+      const el = document.querySelector(sel);
+      if (!el) return;
+      el.focus();
+      const dt = new DataTransfer();
+      dt.setData('text/plain', t);
+      el.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+    }, { sel: SEL.composer, t: text });
+    await sleep(300);
+    if (await verify()) return;
+  } catch { /* başarısız → hata fırlat */ }
 
   throw new Error('ChatGPT kompozitörüne prompt eksiksiz yazılamadı (bütünlük doğrulanamadı). Arayüz değişmiş olabilir.');
 }
