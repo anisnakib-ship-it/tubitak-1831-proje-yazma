@@ -10,46 +10,30 @@ import { getTemplate, DEFAULT_TEMPLATE_ID } from '../templates.js';
 import { parseDocx, isDocx } from './docx.js';
 import { parsePdf, isPdf } from './pdf.js';
 
+// Sheet "analysis form" ile BİREBİR — sıra ve etiketler formla (web/src/forms.js)
+// aynıdır. workAreas kullanıcı alanı değildir; aşağıda FIXED_WORK_AREAS ile sabit
+// eklenir (tüm projelerde aynı).
 const ANALYSIS_LABELS = {
-  // --- TÜBİTAK 1831 standart formu ---
-  companyName: 'Firma Tam Adı',
-  owners: 'Firma Sahibi ve Ortakları',
-  shares: 'Ortakların Hisse Oranları',
-  taxNo: 'Vergi No',
-  address: 'Adres',
-  locations: 'Faaliyet Lokasyonları, Birimleri ve Alan Bilgileri',
-  phone: 'Telefon',
-  web: 'Web Adresi',
-  email: 'E-posta Adresi',
-  foundingDate: 'Firma Kuruluş Tarihi',
-  sectorNace: 'Sektör / NACE Kodu',
-  employees: 'Çalışan Sayısı',
-  suppliers: 'Tedarikçiler',
+  companyName: 'Firma Adı',
+  sectorNace: 'NACE Kodu',
+  area: 'Şehir / Lokasyon',
+  foundingDate: 'Kuruluş Tarihi',
+  locations: 'Adresler, Birimler ve Alan (m²)',
   products: 'Ürünler ve Markalar',
-  foundingStory: 'İşletmenin Kuruluş Hikâyesi',
-  currentActivities: 'Mevcut Faaliyetleri',
-  foreignTrade: 'Dış Ticaret Yapma Durumu',
-  foreignCountries: 'Dış Ticaret Yapılan Ülkeler',
-  customerCount: 'Yıllık Ortalama Müşteri Sayısı',
+  foundingStory: 'Kuruluş Hikâyesi',
+  currentActivities: 'Mevcut Faaliyetler',
+  foreignTrade: 'Dış Ticaret Durumu ve İhracat Ülkeleri',
+  customers: 'Müşteriler',
   competitiveFactors: 'Firmayı Önemli Kılan Faktörler',
   pastProjects: 'Geçmiş Proje Tecrübeleri',
-  rdCapability: 'Ar-Ge Yetkinliği ve Proje Geçmişi',
-  ecoProduction: 'Çevre Dostu Üretim Süreci / Çalışmaları',
-  mentor: 'Mentor Kuruluş / Kişi',
   documents: 'Mevcut Belgeler',
-  personnel: 'Personel Sayıları (Ar-Ge/Üretim/Diğer, cinsiyet ve eğitim)',
-  workAreas: 'Hangi Alanda Proje Yürütülecek (EVET seçilenler)',
-  projectScopeItems: 'Projenin Kapsamı (EVET seçilenler)',
-  needReasons: 'Projeye İhtiyaç Gerekçeleri / Problem Tanımı (EVET seçilenler)',
-  expectedResults: 'Program Kapsamında Beklenen Sonuçlar',
   projectName: 'Projenin Adı',
-
-  // --- Ortak / su verimliliği alanları ---
-  workToBeDone: 'Proje Kapsamında Yapılacak Çalışmalar',
-  workPackages: 'İş Paketleri (Tablo)',
-  waterRegulationStatus: 'Su Verimliliği Yönetmeliği Kapsamı',
-  currentWaterUse: 'Mevcut Su Kullanımı ve Su/Atıksu Verileri',
-  waterTargets: 'Su Verimliliği Hedefleri',
+  mentor: 'Mentor',
+  workAreas: 'Çalışma Alanları (program kapsamı — sabit)',
+  projectScope: 'Projenin Kapsamı',
+  needReasons: 'Projenin Gerekçeleri',
+  expectedResults: 'Beklenen Sonuçlar',
+  workToBeDone: 'Yapılacak Çalışmalar',
   notes: 'Ek Notlar'
 };
 
@@ -179,21 +163,18 @@ Bu bağlamı okuduğunu kısaca onayla. Ardından soruları tek tek göndereceğ
     const guideline = (section?.prompt_body || '').trim();
     let prompt = `SORU ${n} — ${title}\nAşağıdaki kurallara KESİNLİKLE uyarak bu bölümü Türkçe yaz. Sadece bölüm metnini döndür.\n\n${guideline}`;
 
-    // İş Planı sorusu: kullanıcının girdiği iş paketleri tablosunu/çalışmaları doğrudan ve esas alınacak şekilde ekle
+    // İş Planı (Soru 7): iş paketleri programın kendi içeriğinden (program.wp_body,
+    // Bilgi Yönetimi'nden düzenlenir) gelir. YALNIZCA kullanıcı bir iş paketi
+    // BELGESİ yüklediyse o, programın varsayılanını geçersiz kılar. Formdaki
+    // "Yapılacak Çalışmalar" alanı burada iş paketi kaynağı OLARAK KULLANILMAZ
+    // (yalnızca genel bağlamda kalır).
     if (/İş\s*Plan/i.test(title)) {
-      const wp = (analysis.workPackages || '').trim();
-      const wtbd = (analysis.workToBeDone || '').trim();
       const wpDoc = (wpDocText || '').trim();
-      // Kullanıcı kendi iş paketini girmediyse programın varsayılan iş paketi metnini esas al
       const wpNote = (program.wp_body || '').trim();
-      if (wp || wtbd || wpDoc) {
-        prompt += `\n\n=== KULLANICININ GİRDİĞİ İŞ PAKETLERİ (ÖNCELİKLİ — BUNU ESAS AL) ===`;
-        if (wtbd) prompt += `\nProje Kapsamında Yapılacak Çalışmalar:\n${wtbd}`;
-        if (wp) prompt += `\nİş Paketleri Tablosu:\n${wp}`;
-        if (wpDoc) prompt += `\nİş Paketleri Belgesi (yüklenen):\n${wpDoc}`;
-        prompt += `\n\nÖNEMLİ: İş paketlerinin ADLARINI, SAYISINI ve ÇIKTI adlarını yukarıdaki bilgilerden AYNEN al. Kılavuzdaki örnek/varsayılan iş paketi adlarını ve çıktı adlarını KULLANMA. Sadece toplam program süresi sabittir (${template.months} ay); ayları bu süreyle uyumlu olacak şekilde yaz.`;
+      if (wpDoc) {
+        prompt += `\n\n=== İŞ PAKETLERİ BELGESİ (YÜKLENEN — ÖNCELİKLİ, BUNU ESAS AL) ===\n${wpDoc}\n\nÖNEMLİ: İş paketlerinin ADLARINI, SAYISINI ve ÇIKTI adlarını yukarıdaki belgeden AYNEN al. Programın varsayılan/örnek iş paketi adlarını KULLANMA. Toplam program süresi ${template.months} aydır; ayları bu süreyle uyumlu yaz.`;
       } else if (wpNote) {
-        prompt += `\n\n=== İŞ PAKETLERİ BELGESİ (ESAS AL) ===\n${wpNote}\n\nÖNEMLİ: İş paketlerini yukarıdaki belgeye dayanarak hazırla; yapıyı, paket sayısını ve çıktıları koru, sözcükleri aynen kopyalamadan firmaya/ürüne göre detaylandır. Toplam program süresi ${template.months} aydır.`;
+        prompt += `\n\n=== İŞ PAKETLERİ (PROGRAM VARSAYILANI — ESAS AL) ===\n${wpNote}\n\nÖNEMLİ: İş paketlerini yukarıdaki içeriğe dayanarak hazırla; yapıyı, paket sayısını ve çıktıları koru, sözcükleri aynen kopyalamadan firmaya/ürüne göre detaylandır. Toplam program süresi ${template.months} aydır.`;
       }
     }
 
