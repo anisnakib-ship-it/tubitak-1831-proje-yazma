@@ -20,7 +20,10 @@ const SEL = {
   stopButton: '[data-testid="stop-button"]',
   assistantMsg: '[data-message-author-role="assistant"]',
   // Oturum süresi dolup anonim moda düşüldüğünde görünen "giriş yap" modalı
-  noAuthModal: '#modal-no-auth-soft-rate-limit-inline-auth, [data-testid="modal-no-auth-soft-rate-limit-inline-auth"]'
+  noAuthModal: '#modal-no-auth-soft-rate-limit-inline-auth, [data-testid="modal-no-auth-soft-rate-limit-inline-auth"]',
+  // Abonelik doğrulanamadığında (ödeme başarısız/plan süresi dolmuş/kullanım sınırı)
+  // görünen modal. Tüm sayfayı kaplar ve tıklamaları yutar → "send" tıklaması zaman aşımına uğrar.
+  subscriptionFailedModal: '#modal-subscription-failure, [data-testid="modal-subscription-failure"]'
 };
 
 let contextPromise = null;     // tek bir kalıcı bağlam
@@ -185,13 +188,39 @@ async function fillComposer(page, text) {
   throw new Error('ChatGPT kompozitörüne prompt eksiksiz yazılamadı (bütünlük doğrulanamadı). Arayüz değişmiş olabilir.');
 }
 
-/** Compositöre metni güvenilir biçimde yazar ve gönderir. */
-async function sendMessage(page, text) {
+/**
+ * Sayfayı kaplayıp tıklamaları yutan modalları saptar. Kapatılabilir bir modalsa
+ * (Escape / kapat düğmesi) kapatmayı dener. Hâlâ görünüyorsa net bir hata fırlatır;
+ * böylece "send" tıklaması 30 sn boyunca sessizce zaman aşımına uğramaz.
+ */
+async function ensureNoBlockingModal(page) {
   // Oturum süresi dolup anonim moda düşüldüyse sessizce yanlış yere yazmak yerine net hata ver.
   const noAuthModal = page.locator(SEL.noAuthModal).first();
   if (await noAuthModal.isVisible().catch(() => false)) {
     throw new Error('ChatGPT oturumunun süresi doldu ve anonim moda düşüldü. Lütfen üst menüden "ChatGPT Giriş" ile yeniden giriş yapın.');
   }
+
+  // Abonelik doğrulanamadı modalı: önce kapatmayı dene (geçici bir katman olabilir).
+  const subModal = page.locator(SEL.subscriptionFailedModal).first();
+  if (await subModal.isVisible().catch(() => false)) {
+    await page.keyboard.press('Escape').catch(() => {});
+    await sleep(300);
+    if (await subModal.isVisible().catch(() => false)) {
+      const closeBtn = subModal.getByRole('button', { name: /close|kapat|dismiss|not now|şimdi değil|later|sonra/i }).first();
+      if (await closeBtn.isVisible().catch(() => false)) {
+        await closeBtn.click().catch(() => {});
+        await sleep(300);
+      }
+    }
+    if (await subModal.isVisible().catch(() => false)) {
+      throw new Error('ChatGPT "abonelik doğrulanamadı" uyarısı gösteriyor (ödeme başarısız, plan süresi dolmuş veya kullanım sınırı). Otomasyon hesabıyla ChatGPT\'ye girip aboneliği/ödemeyi düzeltin ya da aktif planı olan bir hesap kullanın.');
+    }
+  }
+}
+
+/** Compositöre metni güvenilir biçimde yazar ve gönderir. */
+async function sendMessage(page, text) {
+  await ensureNoBlockingModal(page);
   await fillComposer(page, text);
   await sleep(150);
   // Gönder düğmesi ya da Enter
