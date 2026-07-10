@@ -23,6 +23,24 @@ export const CLAUDE = {
   apiVersion: '2023-06-01'
 };
 
+export const OPENAI = {
+  apiKey: process.env.OPENAI_API_KEY || '',
+  transcriptionModel: process.env.OPENAI_TRANSCRIBE_MODEL || 'whisper-1',
+  extractionModel: process.env.OPENAI_EXTRACT_MODEL || 'gpt-4o-mini'
+};
+
+export const IMPORT = {
+  transcriptionProvider: (process.env.TRANSCRIPTION_PROVIDER || (process.env.OPENAI_API_KEY ? 'openai' : 'local')).toLowerCase(),
+  extractionProvider: (process.env.EXTRACTION_PROVIDER || (process.env.OPENAI_API_KEY ? 'openai' : 'ollama')).toLowerCase(),
+  localWhisperPython: process.env.LOCAL_WHISPER_PYTHON || 'python',
+  localWhisperScript: path.resolve(SERVER_DIR, process.env.LOCAL_WHISPER_SCRIPT || 'scripts/local-transcribe.py'),
+  localWhisperModel: process.env.LOCAL_WHISPER_MODEL || 'small',
+  localWhisperDevice: process.env.LOCAL_WHISPER_DEVICE || 'cpu',
+  localWhisperComputeType: process.env.LOCAL_WHISPER_COMPUTE_TYPE || 'int8',
+  ollamaUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
+  ollamaModel: process.env.OLLAMA_EXTRACT_MODEL || 'qwen2.5:7b'
+};
+
 export const CHATGPT = {
   profileDir: path.join(DATA_DIR, 'chatgpt-profile'),
   // Görünür tarayıcı (ChatGPT otomasyonu headless'te genelde engellenir)

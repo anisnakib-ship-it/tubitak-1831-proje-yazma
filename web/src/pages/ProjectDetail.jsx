@@ -17,21 +17,34 @@ export default function ProjectDetail() {
   const [error, setError] = useState('');
   const [progress, setProgress] = useState(null);
   const [openSec, setOpenSec] = useState(null);
+  const [importTextLength, setImportTextLength] = useState(0);
+  const [importFile, setImportFile] = useState(null);
+  const [importOverwrite, setImportOverwrite] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+  const [importError, setImportError] = useState('');
+  const [importTextFocused, setImportTextFocused] = useState(false);
+  const importTextRef = useRef(null);
+  const importFileRef = useRef(null);
   const pollRef = useRef(null);
   const dirtyRef = useRef(false);
+
+  function applyFieldDefaults(projectType, source = {}) {
+    const a = { ...source };
+    for (const g of formFor(projectType)) {
+      for (const fl of g.fields) {
+        if (fl.default && (a[fl.key] === undefined || a[fl.key] === '')) a[fl.key] = fl.default;
+      }
+    }
+    return a;
+  }
 
   function load() {
     api.getProject(id).then((p) => {
       setProject(p);
       setName(p.name);
       // apply field defaults (e.g. mentor) without marking dirty
-      const a = { ...(p.analysis || {}) };
-      for (const g of formFor(p.project_type)) {
-        for (const fl of g.fields) {
-          if (fl.default && (a[fl.key] === undefined || a[fl.key] === '')) a[fl.key] = fl.default;
-        }
-      }
-      setAnalysis(a);
+      setAnalysis(applyFieldDefaults(p.project_type, p.analysis || {}));
       if (p.status === 'generating') startPolling();
     }).catch((e) => setError(e.message));
   }
@@ -83,6 +96,44 @@ export default function ProjectDetail() {
     await api.uploadFiles(id, files, kind);
     e.target.value = '';
     load();
+  }
+
+  async function importAnalysisFromCall() {
+    setImportError('');
+    setImportResult(null);
+    const transcriptText = importTextRef.current?.value || '';
+    if (!importFile && !transcriptText.trim()) {
+      setImportError(t('detail.import.needInput'));
+      return;
+    }
+    if (dirtyRef.current) await saveNow();
+    setImporting(true);
+    try {
+      const updated = await api.importAnalysis(id, {
+        file: importFile,
+        transcript: transcriptText,
+        mergeMode: importOverwrite ? 'overwrite' : 'fill-empty'
+      });
+      setProject((p) => ({ ...p, ...updated }));
+      setAnalysis(applyFieldDefaults(updated.project_type || project.project_type, updated.analysis || {}));
+      if (updated.name) setName(updated.name);
+      dirtyRef.current = false;
+      setSaveState('saved');
+      setImportResult(updated.import);
+      if (importTextRef.current) importTextRef.current.value = '';
+      setImportTextLength(0);
+      setImportFile(null);
+      if (importFileRef.current) importFileRef.current.value = '';
+    } catch (e) {
+      setImportError(e.message);
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  function onImportTextPaste(e) {
+    const target = e.currentTarget;
+    window.setTimeout(() => setImportTextLength(target.value.length), 0);
   }
 
   const canGenerate = !!(health?.chatgptProfile && health?.googleConfigured);
@@ -170,6 +221,87 @@ export default function ProjectDetail() {
         </section>
 
         <aside className="side">
+          <section className="card import-card">
+            <h2>{t('detail.import.title')}</h2>
+            <p className="muted">{t('detail.import.desc')}</p>
+            <label className="field">
+              <span>{t('detail.import.transcriptLabel')}</span>
+              <textarea
+                ref={importTextRef}
+                className="import-transcript"
+                rows={importTextFocused || importTextLength ? 10 : 5}
+                placeholder={t('detail.import.transcriptPh')}
+                onInput={(e) => setImportTextLength(e.currentTarget.value.length)}
+                onPaste={onImportTextPaste}
+                onFocus={() => setImportTextFocused(true)}
+                onBlur={() => setImportTextFocused(false)}
+                spellCheck={false}
+                disabled={importing}
+              />
+              <em className="muted tiny">{t('detail.import.charCount', { n: importTextLength })}</em>
+            </label>
+            <label className="upload">
+              <input
+                ref={importFileRef}
+                type="file"
+                accept=".flac,.mp3,.mp4,.mpeg,.mpga,.m4a,.ogg,.wav,.webm,.txt,.md,.csv,.json,.docx,.pdf,audio/*,text/*"
+                onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                hidden
+                disabled={importing}
+              />
+              <span>{importFile ? importFile.name : '+ ' + t('detail.import.fileUpload')}</span>
+            </label>
+            <label className="check-item import-overwrite">
+              <input
+                type="checkbox"
+                checked={importOverwrite}
+                onChange={(e) => setImportOverwrite(e.target.checked)}
+                disabled={importing}
+              />
+              <span>{t('detail.import.overwrite')}</span>
+            </label>
+            <button
+              className="btn btn-primary import-btn"
+              onClick={importAnalysisFromCall}
+              disabled={importing || generating || !health?.importConfigured}
+              title={!health?.importConfigured ? t('detail.import.disabledTip') : ''}
+            >
+              {importing ? t('detail.import.importing') : t('detail.import.action')}
+            </button>
+            {!health?.importConfigured && <p className="muted tiny">{t('detail.import.needConfig')}</p>}
+            {importError && <div className="mini-alert mini-alert-err">{importError}</div>}
+            {importResult && (
+              <div className="mini-alert mini-alert-ok">
+                {t('detail.import.done', { n: importResult.filledKeys?.length || 0 })}
+                {importResult.transcribed && <span> {t('detail.import.transcribed')}</span>}
+                {importResult.skippedKeys?.length > 0 && (
+                  <span> {t('detail.import.skipped', { n: importResult.skippedKeys.length })}</span>
+                )}
+              </div>
+            )}
+            {importResult?.filledKeys?.length > 0 && (
+              <details className="import-review">
+                <summary>{t('detail.import.review')}</summary>
+                <ul>
+                  {importResult.filledKeys.slice(0, 12).map((key) => (
+                    <li key={key}>
+                      <strong>{key}</strong>
+                      {importResult.evidence?.[key] && <span>{importResult.evidence[key]}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+            {importResult?.notes?.length > 0 && (
+              <details className="import-review">
+                <summary>{t('detail.import.notes')}</summary>
+                <ul>
+                  {importResult.notes.slice(0, 8).map((note, i) => <li key={i}><span>{note}</span></li>)}
+                </ul>
+              </details>
+            )}
+          </section>
+
           <section className="card">
             <h2>{t('detail.files.wpTitle')}</h2>
             <p className="muted">{t('detail.files.wpDesc')}</p>

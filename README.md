@@ -38,7 +38,9 @@ npx playwright install chromium --prefix server   # ChatGPT otomasyonu için tar
 ```powershell
 Copy-Item server/.env.example server/.env
 ```
-- `CLAUDE_API_KEY` — Anthropic API anahtarınız
+- `TRANSCRIPTION_PROVIDER` — `local` ise ses kayıtları yerel Whisper ile yazıya çevrilir; `openai` ise OpenAI Transcriptions API kullanılır.
+- `EXTRACTION_PROVIDER` — `ollama` ise transkript → analiz formu çıkarımı yerel Ollama modeliyle yapılır; `openai` ise OpenAI API kullanılır.
+- `OPENAI_API_KEY` — yalnızca OpenAI sağlayıcıları seçildiyse gerekir.
 - `RECIPIENTS` — bildirim/paylaşım e-postaları (virgülle)
 - `TEMPLATE_DOC_ID` — (opsiyonel) kopyalanacak şablon Google Doc ID'si
 
@@ -76,6 +78,37 @@ npm run dev
 
 Üretim sırasında görünür bir Chromium penceresi açılır, ChatGPT'ye giriş mesajını ve
 13 soruyu sırayla gönderir, yanıtları toplar. Pencereyi kapatmayın.
+
+## Görüşmeden analiz formu doldurma
+
+Proje detay sayfasındaki **Görüşmeden Doldur** paneli, müşteri görüşmesi ses kaydını
+veya hazır transkript metnini analiz formuna aktarır.
+
+- Yerel mod için `server/.env` içinde:
+  ```env
+  TRANSCRIPTION_PROVIDER=local
+  EXTRACTION_PROVIDER=ollama
+  LOCAL_WHISPER_MODEL=small
+  LOCAL_WHISPER_DEVICE=cpu
+  LOCAL_WHISPER_COMPUTE_TYPE=int8
+  OLLAMA_EXTRACT_MODEL=qwen2.5:7b
+  ```
+- Yerel Whisper kurulumu:
+  ```powershell
+  python -m pip install faster-whisper
+  ```
+  Ayrıca sistemde `ffmpeg` bulunmalıdır. Windows için örnek: `winget install Gyan.FFmpeg`.
+- Yerel form çıkarımı için Ollama kurulumu:
+  ```powershell
+  ollama pull qwen2.5:7b
+  ```
+  Ollama arka planda çalışırken uygulama `http://localhost:11434` adresine istek gönderir.
+- İlk kullanımda Whisper modeli indirileceği için işlem birkaç dakika sürebilir; CPU ile çalışır, GPU varsa daha hızlıdır.
+- `.txt`, `.md`, `.docx` ve `.pdf` gibi transkript dosyaları doğrudan okunur.
+- Aktarım varsayılan olarak yalnızca boş alanları doldurur; paneldeki seçenekle dolu
+  alanların üzerine yazılabilir.
+- Form çıkarımı yalnızca transkriptte açıkça geçen bilgileri kullanacak şekilde
+  sınırlandırılmıştır; eksik bilgi alanları boş bırakılır.
 
 ## Obsidian bilgi grafiğini düzenleme
 

@@ -57,6 +57,8 @@ export default function App() {
             <div className="status-pills">
               <Pill ok={health.chatgptProfile} label="ChatGPT" t={t} />
               <Pill ok={health.googleConfigured} label="Google" t={t} />
+              <Pill ok={health.openaiConfigured} label="OpenAI" t={t} />
+              <Pill ok={health.importConfigured} label="Import" t={t} />
             </div>
           )}
           {health && !health.chatgptProfile && (

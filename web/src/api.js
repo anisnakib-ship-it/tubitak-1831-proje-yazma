@@ -35,6 +35,30 @@ export const api = {
     });
   },
 
+  importAnalysis: (id, { file, transcript = '', mergeMode = 'fill-empty' }) => {
+    if (!file) {
+      return req(`/api/projects/${id}/analysis/import-text`, {
+        method: 'POST',
+        body: JSON.stringify({ transcript, mergeMode })
+      });
+    }
+    const fd = new FormData();
+    if (file) fd.append('file', file);
+    fd.append('transcript', transcript);
+    fd.append('mergeMode', mergeMode);
+    return fetch(`/api/projects/${id}/analysis/import`, { method: 'POST', body: fd }).then(async (r) => {
+      if (!r.ok) {
+        let msg = `Hata ${r.status}`;
+        try {
+          const data = await r.json();
+          msg = data.error || msg;
+        } catch { /* ignore */ }
+        throw new Error(msg);
+      }
+      return r.json();
+    });
+  },
+
   generate: (id) => req(`/api/projects/${id}/generate`, { method: 'POST' }),
   progress: (id) => req(`/api/projects/${id}/progress`),
 

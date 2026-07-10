@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import { Projects, Files, Sections } from '../db.js';
 import { UPLOADS_DIR } from '../config.js';
 import { getTemplate, DEFAULT_TEMPLATE_ID } from '../templates.js';
+import { transcriptFromInput, extractAnalysisFromTranscript, mergeAnalysis } from '../services/analysis-import.js';
 
 const router = Router();
 
@@ -20,6 +21,53 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage, limits: { fileSize: 25 * 1024 * 1024 } });
+
+const importStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(UPLOADS_DIR, req.params.id, 'imports');
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname || '');
+    cb(null, `${Date.now()}-${nanoid(6)}${ext}`);
+  }
+});
+const importUpload = multer({ storage: importStorage, limits: { fileSize: 25 * 1024 * 1024 } });
+
+async function importAnalysisForProject({ project, file, transcript = '', mergeMode = 'fill-empty' }) {
+  const source = await transcriptFromInput({ file, transcript });
+  const { extracted, notes, evidence } = await extractAnalysisFromTranscript({
+    projectType: project.project_type,
+    transcript: source.transcript
+  });
+  const { analysis, filledKeys, skippedKeys } = mergeAnalysis({
+    current: project.analysis || {},
+    extracted,
+    mode: mergeMode
+  });
+
+  const fields = { analysis };
+  if (analysis.companyName) fields.company_name = analysis.companyName;
+  const updated = Projects.update(project.id, fields);
+
+  return {
+    ...updated,
+    import: {
+      fileName: file?.originalname || '',
+      transcribed: source.transcribed,
+      truncated: source.truncated,
+      transcriptChars: source.transcript.length,
+      transcriptPreview: source.transcript.slice(0, 2000),
+      extractedKeys: Object.keys(extracted),
+      filledKeys,
+      skippedKeys,
+      evidence,
+      notes,
+      mergeMode
+    }
+  };
+}
 
 // Liste
 router.get('/', (req, res) => {
@@ -58,6 +106,45 @@ router.put('/:id', (req, res) => {
   if (projectType !== undefined && getTemplate(projectType)) fields.project_type = projectType;
   if (analysis !== undefined) fields.analysis = analysis;
   res.json(Projects.update(project.id, fields));
+});
+
+// Görüşme ses kaydı / transkript dosyasından analiz formunu doldur
+router.post('/:id/analysis/import', importUpload.single('file'), async (req, res, next) => {
+  try {
+    const project = Projects.get(req.params.id);
+    if (!project) return res.status(404).json({ error: 'Proje bulunamadı.' });
+
+    const mergeMode = req.body?.mergeMode === 'overwrite' ? 'overwrite' : 'fill-empty';
+    res.json(await importAnalysisForProject({
+      project,
+      file: req.file,
+      transcript: req.body?.transcript || '',
+      mergeMode
+    }));
+  } catch (err) {
+    next(err);
+  } finally {
+    if (req.file?.path) {
+      try { fs.rmSync(req.file.path, { force: true }); } catch { /* ignore cleanup */ }
+    }
+  }
+});
+
+// Uzun yapıştırılan transkriptlerden analiz formunu doldur (JSON gövde)
+router.post('/:id/analysis/import-text', async (req, res, next) => {
+  try {
+    const project = Projects.get(req.params.id);
+    if (!project) return res.status(404).json({ error: 'Proje bulunamadı.' });
+
+    const mergeMode = req.body?.mergeMode === 'overwrite' ? 'overwrite' : 'fill-empty';
+    res.json(await importAnalysisForProject({
+      project,
+      transcript: req.body?.transcript || '',
+      mergeMode
+    }));
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Sil
