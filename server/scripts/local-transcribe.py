@@ -15,6 +15,7 @@ def main():
     parser.add_argument("--device", default="auto")
     parser.add_argument("--compute-type", default="auto")
     parser.add_argument("--language", default="tr")
+    parser.add_argument("--initial-prompt", default="")
     args = parser.parse_args()
 
     try:
@@ -34,6 +35,8 @@ def main():
         language=args.language,
         vad_filter=True,
         beam_size=5,
+        initial_prompt=args.initial_prompt or None,
+        condition_on_previous_text=True,
     )
     text = "\n".join(segment.text.strip() for segment in segments if segment.text.strip()).strip()
     print(json.dumps({

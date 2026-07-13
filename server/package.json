@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
-    "chatgpt:login": "node scripts/chatgpt-login.js"
+    "chatgpt:login": "node scripts/chatgpt-login.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

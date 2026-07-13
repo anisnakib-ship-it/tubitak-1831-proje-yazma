@@ -35,11 +35,34 @@ export const api = {
     });
   },
 
-  importAnalysis: (id, { file, transcript = '', mergeMode = 'fill-empty' }) => {
+  transcribeAnalysis: (id, file) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    return fetch(`/api/projects/${id}/analysis/transcribe`, { method: 'POST', body: fd }).then(async (r) => {
+      if (!r.ok) {
+        let msg = `Hata ${r.status}`;
+        try {
+          const data = await r.json();
+          msg = data.error || msg;
+        } catch { /* ignore */ }
+        throw new Error(msg);
+      }
+      return r.json();
+    });
+  },
+
+  importAnalysis: (id, {
+    file,
+    transcript = '',
+    mergeMode = 'fill-empty',
+    sourceName = '',
+    sourceKind = '',
+    wasTranscribed = false
+  }) => {
     if (!file) {
       return req(`/api/projects/${id}/analysis/import-text`, {
         method: 'POST',
-        body: JSON.stringify({ transcript, mergeMode })
+        body: JSON.stringify({ transcript, mergeMode, sourceName, sourceKind, wasTranscribed })
       });
     }
     const fd = new FormData();
@@ -58,6 +81,7 @@ export const api = {
       return r.json();
     });
   },
+  getAnalysisImport: (projectId, importId) => req(`/api/projects/${projectId}/analysis/imports/${importId}`),
 
   generate: (id) => req(`/api/projects/${id}/generate`, { method: 'POST' }),
   progress: (id) => req(`/api/projects/${id}/progress`),

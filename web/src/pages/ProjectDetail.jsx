@@ -17,11 +17,15 @@ export default function ProjectDetail() {
   const [error, setError] = useState('');
   const [progress, setProgress] = useState(null);
   const [openSec, setOpenSec] = useState(null);
+  const [importText, setImportText] = useState('');
   const [importTextLength, setImportTextLength] = useState(0);
   const [importFile, setImportFile] = useState(null);
+  const [transcriptSource, setTranscriptSource] = useState(null);
   const [importOverwrite, setImportOverwrite] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
+  const [importDetails, setImportDetails] = useState({});
   const [importError, setImportError] = useState('');
   const [importTextFocused, setImportTextFocused] = useState(false);
   const importTextRef = useRef(null);
@@ -101,8 +105,7 @@ export default function ProjectDetail() {
   async function importAnalysisFromCall() {
     setImportError('');
     setImportResult(null);
-    const transcriptText = importTextRef.current?.value || '';
-    if (!importFile && !transcriptText.trim()) {
+    if (!importText.trim()) {
       setImportError(t('detail.import.needInput'));
       return;
     }
@@ -110,9 +113,11 @@ export default function ProjectDetail() {
     setImporting(true);
     try {
       const updated = await api.importAnalysis(id, {
-        file: importFile,
-        transcript: transcriptText,
-        mergeMode: importOverwrite ? 'overwrite' : 'fill-empty'
+        transcript: importText,
+        mergeMode: importOverwrite ? 'overwrite' : 'fill-empty',
+        sourceName: transcriptSource?.fileName || '',
+        sourceKind: transcriptSource?.sourceKind || 'text',
+        wasTranscribed: !!transcriptSource?.transcribed
       });
       setProject((p) => ({ ...p, ...updated }));
       setAnalysis(applyFieldDefaults(updated.project_type || project.project_type, updated.analysis || {}));
@@ -120,10 +125,7 @@ export default function ProjectDetail() {
       dirtyRef.current = false;
       setSaveState('saved');
       setImportResult(updated.import);
-      if (importTextRef.current) importTextRef.current.value = '';
-      setImportTextLength(0);
-      setImportFile(null);
-      if (importFileRef.current) importFileRef.current.value = '';
+      load();
     } catch (e) {
       setImportError(e.message);
     } finally {
@@ -131,9 +133,38 @@ export default function ProjectDetail() {
     }
   }
 
-  function onImportTextPaste(e) {
-    const target = e.currentTarget;
-    window.setTimeout(() => setImportTextLength(target.value.length), 0);
+  async function transcribeImportFile() {
+    setImportError('');
+    setImportResult(null);
+    if (!importFile) {
+      setImportError(t('detail.import.needFile'));
+      return;
+    }
+    setTranscribing(true);
+    try {
+      const result = await api.transcribeAnalysis(id, importFile);
+      setImportText(result.transcript || '');
+      setImportTextLength(result.transcript?.length || 0);
+      setTranscriptSource({
+        fileName: result.fileName || importFile.name,
+        sourceKind: result.transcribed ? 'audio' : 'file',
+        transcribed: !!result.transcribed
+      });
+    } catch (e) {
+      setImportError(e.message);
+    } finally {
+      setTranscribing(false);
+    }
+  }
+
+  async function loadImportDetail(importId) {
+    if (importDetails[importId]) return;
+    try {
+      const detail = await api.getAnalysisImport(id, importId);
+      setImportDetails((current) => ({ ...current, [importId]: detail }));
+    } catch (e) {
+      setImportDetails((current) => ({ ...current, [importId]: { error_message: e.message } }));
+    }
   }
 
   const canGenerate = !!(health?.chatgptProfile && health?.googleConfigured);
@@ -224,32 +255,54 @@ export default function ProjectDetail() {
           <section className="card import-card">
             <h2>{t('detail.import.title')}</h2>
             <p className="muted">{t('detail.import.desc')}</p>
+            <label className="upload">
+              <input
+                ref={importFileRef}
+                type="file"
+                accept=".flac,.mp3,.mp4,.mpeg,.mpga,.m4a,.ogg,.wav,.webm,.txt,.md,.csv,.json,.docx,.pdf,audio/*,text/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  setImportFile(file);
+                  setTranscriptSource(null);
+                  setImportText('');
+                  setImportTextLength(0);
+                  setImportResult(null);
+                }}
+                hidden
+                disabled={importing || transcribing}
+              />
+              <span>{importFile ? importFile.name : '+ ' + t('detail.import.fileUpload')}</span>
+            </label>
+            <button
+              className="btn import-btn"
+              onClick={transcribeImportFile}
+              disabled={!importFile || transcribing || importing || generating}
+            >
+              {transcribing ? t('detail.import.transcribing') : t('detail.import.transcribe')}
+            </button>
+            {transcriptSource && (
+              <div className="mini-alert mini-alert-ok">
+                {t('detail.import.transcriptReady', { n: importTextLength })}
+              </div>
+            )}
             <label className="field">
               <span>{t('detail.import.transcriptLabel')}</span>
               <textarea
                 ref={importTextRef}
                 className="import-transcript"
                 rows={importTextFocused || importTextLength ? 10 : 5}
+                value={importText}
                 placeholder={t('detail.import.transcriptPh')}
-                onInput={(e) => setImportTextLength(e.currentTarget.value.length)}
-                onPaste={onImportTextPaste}
+                onChange={(e) => {
+                  setImportText(e.currentTarget.value);
+                  setImportTextLength(e.currentTarget.value.length);
+                }}
                 onFocus={() => setImportTextFocused(true)}
                 onBlur={() => setImportTextFocused(false)}
                 spellCheck={false}
-                disabled={importing}
+                disabled={importing || transcribing}
               />
               <em className="muted tiny">{t('detail.import.charCount', { n: importTextLength })}</em>
-            </label>
-            <label className="upload">
-              <input
-                ref={importFileRef}
-                type="file"
-                accept=".flac,.mp3,.mp4,.mpeg,.mpga,.m4a,.ogg,.wav,.webm,.txt,.md,.csv,.json,.docx,.pdf,audio/*,text/*"
-                onChange={(e) => setImportFile(e.target.files?.[0] || null)}
-                hidden
-                disabled={importing}
-              />
-              <span>{importFile ? importFile.name : '+ ' + t('detail.import.fileUpload')}</span>
             </label>
             <label className="check-item import-overwrite">
               <input
@@ -263,12 +316,18 @@ export default function ProjectDetail() {
             <button
               className="btn btn-primary import-btn"
               onClick={importAnalysisFromCall}
-              disabled={importing || generating || !health?.importConfigured}
+              disabled={importing || transcribing || generating || !importText.trim() || !health?.importConfigured}
               title={!health?.importConfigured ? t('detail.import.disabledTip') : ''}
             >
-              {importing ? t('detail.import.importing') : t('detail.import.action')}
+              {importing ? t('detail.import.importing') : t('detail.import.fillAutomatically')}
             </button>
-            {!health?.importConfigured && <p className="muted tiny">{t('detail.import.needConfig')}</p>}
+            {!health?.importConfigured && (
+              <p className="muted tiny">
+                {health?.extractionProvider === 'ollama' && health?.ollamaReachable === false
+                  ? t('detail.import.needOllama')
+                  : t('detail.import.needConfig')}
+              </p>
+            )}
             {importError && <div className="mini-alert mini-alert-err">{importError}</div>}
             {importResult && (
               <div className="mini-alert mini-alert-ok">
@@ -299,6 +358,43 @@ export default function ProjectDetail() {
                   {importResult.notes.slice(0, 8).map((note, i) => <li key={i}><span>{note}</span></li>)}
                 </ul>
               </details>
+            )}
+            {project.analysisImports?.length > 0 && (
+              <div className="import-history">
+                <h3>{t('detail.import.history')}</h3>
+                {project.analysisImports.map((run) => {
+                  const detail = importDetails[run.id];
+                  const importedCount = run.filled_keys?.length || 0;
+                  return (
+                    <details
+                      className="import-review"
+                      key={run.id}
+                      onToggle={(e) => { if (e.currentTarget.open) loadImportDetail(run.id); }}
+                    >
+                      <summary>
+                        {new Date(`${run.created_at}Z`).toLocaleString(lang === 'tr' ? 'tr-TR' : 'en-GB')}
+                        {' · '}{run.status === 'completed'
+                          ? t('detail.import.historyFields', { n: importedCount })
+                          : t('detail.import.historyError')}
+                      </summary>
+                      {detail?.error_message && <p className="import-error-text">{detail.error_message}</p>}
+                      {!detail && <p className="muted tiny">{t('projects.loading')}</p>}
+                      {detail?.transcript && (
+                        <>
+                          <strong className="import-subhead">{t('detail.import.savedTranscript')}</strong>
+                          <pre className="import-transcript-preview">{detail.transcript}</pre>
+                        </>
+                      )}
+                      {detail?.rejected?.length > 0 && (
+                        <>
+                          <strong className="import-subhead">{t('detail.import.rejected')}</strong>
+                          <ul>{detail.rejected.map((reason, index) => <li key={index}><span>{reason}</span></li>)}</ul>
+                        </>
+                      )}
+                    </details>
+                  );
+                })}
+              </div>
             )}
           </section>
 

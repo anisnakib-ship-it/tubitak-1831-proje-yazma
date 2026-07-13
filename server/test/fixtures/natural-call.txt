@@ -1,0 +1,18 @@
+Danışman: Firma tam adını alabilir miyim?
+Müşteri: Örnek Su Teknolojileri Anonim Şirketi.
+Danışman: Ne zaman kuruldu?
+Müşteri: Şirketimiz 2021'de kuruldu. Öncesinde kurucularımız arıtma sektöründe çalışıyordu.
+Danışman: Kaç çalışanınız var?
+Müşteri: Toplam 42 çalışanımız var.
+Danışman: Web siteniz var mı?
+Müşteri: Henüz web sitemiz yok, hazırlık devam ediyor.
+Danışman: Dış ticaret var mı?
+Müşteri: Evet, Almanya ve Hollanda'ya ihracat yapıyoruz.
+Danışman: Yıllık ortalama kaç müşteriniz oluyor?
+Müşteri: Yıllık ortalamada 10-20 müşteriye hizmet veriyoruz.
+Danışman: ISO 14001 belgeniz var mı?
+Müşteri: ISO 14001 belgemiz var ancak ISO 14046 belgemiz henüz yok.
+Danışman: Firmanızı önemli kılan faktör nedir?
+Müşteri: Kapalı devre su geri kazanımındaki uygulama deneyimimiz bizi farklılaştırıyor.
+Danışman: Daha önce proje yaptınız mı?
+Müşteri: İki enerji verimliliği projesini tamamladık.

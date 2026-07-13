@@ -44,7 +44,43 @@ db.exec(`
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
   );
+
+  CREATE TABLE IF NOT EXISTS analysis_imports (
+    id              TEXT PRIMARY KEY,
+    project_id      TEXT NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'processing',
+    source_name     TEXT,
+    source_kind     TEXT NOT NULL DEFAULT 'text',
+    transcript      TEXT NOT NULL,
+    transcribed     INTEGER NOT NULL DEFAULT 0,
+    truncated       INTEGER NOT NULL DEFAULT 0,
+    provider        TEXT,
+    raw_result      TEXT,
+    extracted       TEXT,
+    evidence        TEXT,
+    notes           TEXT,
+    rejected        TEXT,
+    filled_keys     TEXT,
+    skipped_keys    TEXT,
+    merge_mode      TEXT NOT NULL DEFAULT 'fill-empty',
+    error_message   TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    completed_at    TEXT,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_analysis_imports_project_created
+    ON analysis_imports(project_id, created_at DESC);
 `);
+
+// A process restart necessarily abandons imports that were still running in the previous process.
+db.prepare(`
+  UPDATE analysis_imports
+  SET status = 'error',
+      error_message = 'Sunucu yeniden başlatıldığı için içe aktarma tamamlanamadı. Lütfen tekrar deneyin.',
+      completed_at = datetime('now')
+  WHERE status = 'processing'
+`).run();
 
 // Migration: mevcut veritabanına project_type sütununu ekle
 try {
@@ -151,6 +187,52 @@ export const Sections = {
   }
 };
 
+export const AnalysisImports = {
+  create({ id, projectId, sourceName = '', sourceKind = 'text', transcript, transcribed = false, truncated = false, provider = '', mergeMode = 'fill-empty' }) {
+    db.prepare(`
+      INSERT INTO analysis_imports
+        (id, project_id, source_name, source_kind, transcript, transcribed, truncated, provider, merge_mode)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(id, projectId, sourceName, sourceKind, transcript, transcribed ? 1 : 0, truncated ? 1 : 0, provider, mergeMode);
+    return this.get(id);
+  },
+
+  complete(id, { rawResult = {}, extracted = {}, evidence = {}, notes = [], rejected = [], filledKeys = [], skippedKeys = [] }) {
+    db.prepare(`
+      UPDATE analysis_imports SET
+        status = 'completed', raw_result = ?, extracted = ?, evidence = ?, notes = ?, rejected = ?,
+        filled_keys = ?, skipped_keys = ?, completed_at = datetime('now')
+      WHERE id = ?
+    `).run(
+      JSON.stringify(rawResult), JSON.stringify(extracted), JSON.stringify(evidence), JSON.stringify(notes),
+      JSON.stringify(rejected), JSON.stringify(filledKeys), JSON.stringify(skippedKeys), id
+    );
+    return this.get(id);
+  },
+
+  fail(id, error) {
+    db.prepare(`
+      UPDATE analysis_imports SET status = 'error', error_message = ?, completed_at = datetime('now') WHERE id = ?
+    `).run(String(error?.message || error || 'Unknown import error'), id);
+    return this.get(id);
+  },
+
+  get(id) {
+    const row = db.prepare(`SELECT * FROM analysis_imports WHERE id = ?`).get(id);
+    return row ? hydrateImport(row, true) : null;
+  },
+
+  listByProject(projectId, limit = 10) {
+    return db.prepare(`
+      SELECT id, project_id, status, source_name, source_kind, transcribed, truncated, provider,
+        extracted, evidence, notes, rejected, filled_keys, skipped_keys, merge_mode, error_message,
+        created_at, completed_at, length(transcript) AS transcript_chars,
+        substr(transcript, 1, 500) AS transcript_preview
+      FROM analysis_imports WHERE project_id = ? ORDER BY datetime(created_at) DESC LIMIT ?
+    `).all(projectId, limit).map((row) => hydrateImport(row, false));
+  }
+};
+
 function hydrate(row) {
   return {
     ...row,
@@ -163,5 +245,31 @@ function safeParse(json) {
     return json ? JSON.parse(json) : {};
   } catch {
     return {};
+  }
+}
+
+function hydrateImport(row, includeTranscript) {
+  const hydrated = {
+    ...row,
+    transcribed: !!row.transcribed,
+    truncated: !!row.truncated,
+    raw_result: safeParseOr(row.raw_result, {}),
+    extracted: safeParseOr(row.extracted, {}),
+    evidence: safeParseOr(row.evidence, {}),
+    notes: safeParseOr(row.notes, []),
+    rejected: safeParseOr(row.rejected, []),
+    filled_keys: safeParseOr(row.filled_keys, []),
+    skipped_keys: safeParseOr(row.skipped_keys, [])
+  };
+  if (!includeTranscript) delete hydrated.transcript;
+  return hydrated;
+}
+
+function safeParseOr(json, fallback) {
+  if (!json) return fallback;
+  try {
+    return JSON.parse(json);
+  } catch {
+    return fallback;
   }
 }

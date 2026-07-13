@@ -34,10 +34,12 @@ export const IMPORT = {
   extractionProvider: (process.env.EXTRACTION_PROVIDER || (process.env.OPENAI_API_KEY ? 'openai' : 'ollama')).toLowerCase(),
   localWhisperPython: process.env.LOCAL_WHISPER_PYTHON || 'python',
   localWhisperScript: path.resolve(SERVER_DIR, process.env.LOCAL_WHISPER_SCRIPT || 'scripts/local-transcribe.py'),
-  localWhisperModel: process.env.LOCAL_WHISPER_MODEL || 'small',
-  localWhisperDevice: process.env.LOCAL_WHISPER_DEVICE || 'cpu',
-  localWhisperComputeType: process.env.LOCAL_WHISPER_COMPUTE_TYPE || 'int8',
-  ollamaUrl: process.env.OLLAMA_URL || 'http://localhost:11434',
+  localWhisperModel: process.env.LOCAL_WHISPER_MODEL || 'medium',
+  localWhisperDevice: process.env.LOCAL_WHISPER_DEVICE || 'cuda',
+  localWhisperComputeType: process.env.LOCAL_WHISPER_COMPUTE_TYPE || 'int8_float16',
+  localWhisperInitialPrompt: process.env.LOCAL_WHISPER_INITIAL_PROMPT ||
+    'TÜBİTAK 1831 Yeşil Dönüşüm müşteri görüşmesi. Firma, NACE kodu, MERSİS, karbon ayak izi, su ayak izi, su verimliliği, Mavi Sertifika, emisyon, atık, enerji, sürdürülebilirlik, ISO 14001, ISO 14046, ISO 14064, iş paketi.',
+  ollamaUrl: process.env.OLLAMA_URL || 'http://127.0.0.1:11434',
   ollamaModel: process.env.OLLAMA_EXTRACT_MODEL || 'qwen2.5:7b'
 };
 

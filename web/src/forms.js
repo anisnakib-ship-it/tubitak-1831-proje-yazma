@@ -40,7 +40,9 @@ const DOCUMENTS = [
   'Çevre Ruhsatı ve İzni', 'Atık Yönetim Planı', 'Atık Beyan Formu', 'Atık Su Deşarj İzinleri ve Kanal Bağlantı İzni',
   'Atık Su Analiz Sonuçları', 'Hava Emisyon Raporu', 'Gürültü Ölçüm Sonuçları', 'Koku Emisyon Ölçüm Sonuçları',
   'Acil Müdahale Planı', 'ISO 14001 – Çevre Yönetim Sistemi', 'ISO 50001 – Enerji Yönetim Sistemi',
-  'ISO 14064 – Karbon Ayak İzi Doğrulama', 'ISO 14067 – Ürün Karbon Ayak İzi', 'ISO 14046 – Su Ayak İzi'
+  'ISO 14064 – Karbon Ayak İzi Doğrulama', 'ISO 14067 – Ürün Karbon Ayak İzi', 'ISO 14046 – Su Ayak İzi',
+  'GOTS – Global Organic Textile Standard', 'OCS – Organic Content Standard', 'RCS – Recycled Claim Standard',
+  'GRS – Global Recycled Standard', 'SLCP – Social & Labor Convergence Program'
 ];
 
 const f = (key, type, tr, en, ph = '', extra = {}) => ({ key, type, tr, en, ph, ...extra });

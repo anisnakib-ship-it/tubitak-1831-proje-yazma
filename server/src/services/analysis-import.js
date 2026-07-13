@@ -11,24 +11,13 @@ const AUDIO_EXTENSIONS = new Set(['.flac', '.mp3', '.mp4', '.mpeg', '.mpga', '.m
 const TEXT_EXTENSIONS = new Set(['.txt', '.md', '.csv', '.json', '.rtf']);
 const MAX_TRANSCRIPT_CHARS = 500000;
 const MAX_MODEL_TRANSCRIPT_CHARS = 60000;
-const MISSING_VALUE_RE = /^(not provided(?: in the transcript)?|not mentioned|unknown|n\/a|null|bilgi yok|belirtilmedi|verilmedi|yok)$/i;
-const MODEL_TEXT_FIELDS = new Set([
-  'locations',
-  'products',
-  'suppliers',
-  'foundingStory',
-  'currentActivities',
-  'foreignTrade',
-  'foreignCountries',
-  'customerCount',
-  'personnel',
-  'expectedResults',
-  'workToBeDone',
-  'workPackages',
-  'projectName',
-  'notes'
-]);
+const MISSING_VALUE_RE = /^(not provided(?: in the transcript)?|not mentioned|unknown|n\/a|null|bilgi yok|bilgi bulunmadı|yeterli bilgi verilmedi|belirsiz|belirtilmedi|verilmedi|yok)$/i;
 const SHORT_FIELD_MAX = 180;
+const SHORT_FIELDS = new Set([
+  'companyName', 'owners', 'shares', 'taxNo', 'foundingDate', 'sectorNace', 'employees',
+  'phone', 'web', 'email', 'foreignTrade', 'foreignCountries', 'customerCount', 'mentor',
+  'projectName'
+]);
 
 const CHECKLIST_KEYWORDS = {
   projectScopeItems: {
@@ -86,7 +75,12 @@ const CHECKLIST_KEYWORDS = {
     'ISO 50001 – Enerji Yönetim Sistemi': ['iso 50001'],
     'ISO 14064 – Karbon Ayak İzi Doğrulama': ['iso 14064'],
     'ISO 14067 – Ürün Karbon Ayak İzi': ['iso 14067'],
-    'ISO 14046 – Su Ayak İzi': ['iso 14046']
+    'ISO 14046 – Su Ayak İzi': ['iso 14046'],
+    'GOTS – Global Organic Textile Standard': ['gots'],
+    'OCS – Organic Content Standard': ['ocs'],
+    'RCS – Recycled Claim Standard': ['rcs'],
+    'GRS – Global Recycled Standard': ['grs'],
+    'SLCP – Social & Labor Convergence Program': ['slcp', 's-c-l-p']
   }
 };
 
@@ -137,17 +131,32 @@ function evidenceAppears(evidence, transcript) {
   return normalizeEvidence(transcript).includes(ev);
 }
 
+function looksLikeQuestion(text) {
+  const value = lowerTr(text);
+  return /\?/.test(value) ||
+    /(?:^|[\s,;:])(?:mi|mu|mü|nedir|nelerdir|kaç|hangi|kimdir|var mi|yok mu|yapiyor musunuz|yapiyor mu|söyler misiniz|paylaşir misiniz|tanimlar misiniz)(?=$|[\s,;:.?!])/u.test(value);
+}
+
 function matchFirst(text, regex) {
   const m = text.match(regex);
   return m ? cleanValue(m[1]) : '';
 }
 
-function keywordSelections(key, transcript) {
-  const map = CHECKLIST_KEYWORDS[key] || {};
-  const lower = lowerTr(transcript);
-  return Object.entries(map)
-    .filter(([, keywords]) => keywords.some((kw) => lower.includes(lowerTr(kw))))
-    .map(([option]) => option);
+function checklistOptionSupported(key, option, evidence) {
+  const normalizedEvidence = lowerTr(evidence);
+  const keywords = CHECKLIST_KEYWORDS[key]?.[option] || [];
+  const candidates = [option, ...keywords].map(lowerTr);
+  return candidates.some((candidate) => {
+    if (!normalizedEvidence.includes(candidate)) return false;
+    const clause = normalizedEvidence
+      .split(/\b(?:ancak|fakat|ama)\b|[.;\n]/u)
+      .find((part) => part.includes(candidate)) || normalizedEvidence;
+    if (key === 'projectScopeItems' && /\b(?:daha önce|geçmiş|tamamladik|tamamlandi|önceki proje)\b/u.test(clause) &&
+        !/\b(?:istiyoruz|planliyoruz|yapilacak|uygulanacak|kapsaminda|hedefliyoruz|destek almak)\b/u.test(clause)) {
+      return false;
+    }
+    return !/\b(?:yok|değil|degil|bulunmuyor|mevcut değil|mevcut degil|sahip değiliz|sahip degiliz|henüz yok)\b/u.test(clause);
+  });
 }
 
 function extractPercentShares(transcript) {
@@ -168,6 +177,21 @@ function transcriptForModel(transcript) {
 [... UZUN TRANSKRIPTIN ORTA KISMI KISALTILDI; yalnızca açıkça verilen bilgileri çıkar ...]
 
 ${transcript.slice(-half)}`;
+}
+
+function numberTranscriptLines(transcript) {
+  const segments = normalizeText(transcript)
+    .split('\n')
+    .flatMap((line) => line.split(/(?<=[.!?])\s+(?=[\p{L}\d])/u))
+    .map((line) => normalizeText(line))
+    .filter(Boolean);
+  const lineMap = new Map();
+  const numbered = segments.map((line, index) => {
+    const id = `L${String(index + 1).padStart(4, '0')}`;
+    lineMap.set(id, line);
+    return `[${id}] ${line}`;
+  });
+  return { text: numbered.join('\n'), lineMap };
 }
 
 function isAudio(file) {
@@ -234,14 +258,40 @@ async function transcribeAudioLocal(file) {
     throw new Error(`Yerel Whisper betiği bulunamadı: ${IMPORT.localWhisperScript}`);
   }
 
-  const { stdout } = await runProcess(IMPORT.localWhisperPython, [
+  const transcribeArgs = (device, computeType) => [
     IMPORT.localWhisperScript,
     '--file', file.path,
     '--model', IMPORT.localWhisperModel,
-    '--device', IMPORT.localWhisperDevice,
-    '--compute-type', IMPORT.localWhisperComputeType,
-    '--language', 'tr'
-  ]);
+    '--device', device,
+    '--compute-type', computeType,
+    '--language', 'tr',
+    '--initial-prompt', IMPORT.localWhisperInitialPrompt
+  ];
+
+  if (IMPORT.localWhisperDevice === 'cuda') {
+    try {
+      await fetch(`${IMPORT.ollamaUrl.replace(/\/+$/, '')}/api/generate`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ model: IMPORT.ollamaModel, keep_alive: 0 })
+      });
+    } catch { /* Whisper can continue even when Ollama is not running. */ }
+  }
+
+  let stdout;
+  try {
+    ({ stdout } = await runProcess(IMPORT.localWhisperPython, transcribeArgs(
+      IMPORT.localWhisperDevice,
+      IMPORT.localWhisperComputeType
+    )));
+  } catch (err) {
+    if (IMPORT.localWhisperDevice !== 'cuda') throw err;
+    ({ stdout } = await runProcess(
+      IMPORT.localWhisperPython,
+      transcribeArgs('cpu', 'int8'),
+      { timeoutMs: 60 * 60 * 1000 }
+    ));
+  }
 
   let parsed;
   try {
@@ -302,10 +352,15 @@ function fieldLabel(field) {
 
 function schemaForFields(fields) {
   const properties = {};
+  const evidenceProperties = {};
   const required = [];
 
   for (const field of fields) {
     required.push(field.key);
+    evidenceProperties[field.key] = {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description: `Exact answer quote supporting ${field.tr}; null when the field is empty.`
+    };
     if (field.type === 'checklist') {
       properties[field.key] = {
         type: 'array',
@@ -333,9 +388,47 @@ function schemaForFields(fields) {
         type: 'array',
         items: { type: 'string' },
         description: 'Short warnings about ambiguous or missing information.'
+      },
+      evidence: {
+        type: 'object',
+        properties: evidenceProperties,
+        required,
+        additionalProperties: false
       }
     },
-    required: ['analysis', 'notes'],
+    required: ['analysis', 'evidence', 'notes'],
+    additionalProperties: false
+  };
+}
+
+function schemaForEvidenceItems(fields) {
+  return {
+    type: 'object',
+    properties: {
+      items: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            key: { type: 'string', enum: fields.map((field) => field.key) },
+            value: {
+              anyOf: [
+                { type: 'string' },
+                { type: 'array', items: { type: 'string' } }
+              ]
+            },
+            evidenceLineIds: {
+              type: 'array',
+              items: { type: 'string' }
+            }
+          },
+          required: ['key', 'value', 'evidenceLineIds'],
+          additionalProperties: false
+        }
+      },
+      notes: { type: 'array', items: { type: 'string' } }
+    },
+    required: ['items', 'notes'],
     additionalProperties: false
   };
 }
@@ -348,12 +441,18 @@ function extractionPrompt({ fields, transcript }) {
 
   return `You extract a TÜBİTAK 1831 customer analysis form from a call transcript.
 
+Return an analysis object, an evidence object with the same field keys, and notes.
+
 Rules:
 - Use only information that is explicitly stated or unmistakably confirmed in the transcript.
+- Extract answers, not the interviewer's questions. A standalone question is never evidence.
+- When speakers are labelled, use customer answers. When they are not labelled, use the declarative answer following a question, never the question itself.
 - Do not invent numbers, capacities, dates, certificates, exports, customers, investments, machinery, or project details.
-- Keep the customer's original wording where it helps the later project writer.
+- Write concise, coherent Turkish values. Omit garbled or uncertain phrases and add a note instead.
 - If a text field is not answered, return null for that field.
 - For checklist fields, select only the provided options. Return [] when no option is clearly supported.
+- For each non-empty field, evidence must be a short exact quote copied from the customer's answer. Use null evidence for empty fields.
+- Respect negation. A document, capability, export market, or activity mentioned only in a question or denied by the customer is not present.
 - Prefer Turkish output because the final application is Turkish.
 
 Form fields:
@@ -365,8 +464,10 @@ ${transcript}`;
 
 function evidencePrompt({ fields, transcript }) {
   const fieldList = fields
-    .filter((field) => MODEL_TEXT_FIELDS.has(field.key))
-    .map((field) => `- ${field.key}: ${field.groupTr} / ${field.tr}`)
+    .map((field) => {
+      const optionText = field.options?.length ? ` Options: ${field.options.join(' | ')}` : '';
+      return `- ${field.key}: ${field.groupTr} / ${field.tr}.${optionText}`;
+    })
     .join('\n');
 
   return `Extract only clearly stated customer-analysis form fields from this Turkish call transcript.
@@ -374,7 +475,7 @@ function evidencePrompt({ fields, transcript }) {
 Return JSON only in this shape:
 {
   "items": [
-    { "key": "fieldKey", "value": "field value in Turkish", "evidence": "exact short quote copied from transcript" }
+    { "key": "fieldKey", "value": "field value in Turkish", "evidenceLineIds": ["L0001"] }
   ],
   "notes": []
 }
@@ -382,12 +483,18 @@ Return JSON only in this shape:
 Strict rules:
 - Only use these field keys:
 ${fieldList}
-- Do not extract company name, tax number, NACE, employee count, phone, website, email, checklist fields, or certificates; those are handled by rules outside the model.
-- Every item must include a short exact evidence quote copied from the transcript.
+- Cover every supported field, including company details, numeric fields, contact information, narrative fields, and checklists.
+- Extract answers, not the interviewer's questions. Text ending in "?", "var mı", "kaç", "hangi", or similar question language is never an answer.
+- When speaker labels exist, use customer answers. Without labels, use only declarative answer passages, not the preceding question.
+- Every item must cite only the numbered customer-answer lines that support its value.
+- Never cite a question line. If a question and answer are on separate lines, cite only the answer line.
+- You may cite multiple non-contiguous answer lines when a field needs them.
 - If a field is not explicitly stated, omit it.
 - Do not write "not provided", "unknown", or similar placeholders.
-- Do not infer, summarize beyond the transcript, or add generic sustainability language.
-- Keep values concise. Prefer the customer's wording.
+- Respect negation and do not select checklist options merely because the interviewer named them.
+- Checklist values must be arrays containing only the listed options.
+- Do not infer beyond the transcript or add generic sustainability language.
+- Keep values concise and coherent. If transcription text is garbled or uncertain, omit that part and add a note.
 
 Transcript:
 ${transcript}`;
@@ -487,7 +594,7 @@ function heuristicAnalysis(transcript) {
     matchFirst(transcript, /müşteri:\s*(mevcut durum analizi[^.\n]+destek almak istiyoruz)/iu);
   if (workToBeDone) out.workToBeDone = workToBeDone;
 
-  for (const key of ['projectScopeItems', 'needReasons', 'documents']) {
+  for (const key of ['projectScopeItems', 'documents']) {
     const values = keywordSelections(key, transcript);
     if (values.length) out[key] = values;
   }
@@ -577,29 +684,226 @@ function cleanSuggestions(parsed, fields, transcript = '') {
   return { extracted: out, evidence, rejected };
 }
 
+export function heuristicSuggestionsV2(transcript) {
+  const items = [];
+  const addMatch = (key, regex, transform = cleanValue) => {
+    const matcher = new RegExp(regex.source, regex.flags.includes('g') ? regex.flags : `${regex.flags}g`);
+    for (const match of transcript.matchAll(matcher)) {
+      if (looksLikeQuestion(match[0])) continue;
+      const value = transform(match[1]);
+      if (value) items.push({ key, value, evidence: normalizeText(match[0]) });
+      return;
+    }
+  };
+
+  addMatch('companyName', /(?:firma adımız|şirketimizin adı)\s+([^.\n]+)/iu);
+  addMatch('companyName', /firma tam adı\s*[:,-]\s*([^.\n]+)/iu);
+  addMatch('taxNo', /(?:vergi numaramız|vergi no(?:muz|su)?)\s*[:,-]?\s*([0-9][0-9\s-]{5,})/iu, digitsOnly);
+  addMatch('foundingDate', /(\d{4})(?:\s+yılında|['’]?(?:de|da))[^.\n]*\bkurul(?:du|duk|muş)/iu);
+  addMatch('sectorNace', /nace(?:\s+kodu(?:muz)?)?\s*[:,-]?\s*([0-9]+(?:\.[0-9]+)?[^.\n]*)/iu);
+  addMatch('employees', /(?:toplam\s*)?(\d+)\s+çalışan(?:ımız)?\b/iu);
+  addMatch('address', /adresimiz\s*[:,-]?\s*([^.\n]+)/iu);
+  addMatch('phone', /telefon(?:umuz)?\s*[:,-]?\s*([0-9\s()+-]{7,})/iu);
+  addMatch('web', /(?:web\s+site(?:miz|si)?\s*[:,-]?\s*)?((?:https?:\/\/|www\.)[^\s,;]+)/iu, (value) => cleanValue(value).replace(/[.]+$/, ''));
+  addMatch('email', /(?:e-?posta\s*[:,-]?\s*)?([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/iu);
+  addMatch('foreignTrade', /(dış ticaret\s+(?:yapıyoruz|yapmıyoruz)|(?:dış ticaret|ihracat|ithalat)(?:ımız)?\s+(?:var|yok))\b[^.\n]*/iu);
+  addMatch('customerCount', /yıllık ortalama(?:da)?\s+(\d+(?:\s*[-–]\s*\d+)?)\s+müşteri/iu);
+
+  const clauses = transcript
+    .split(/\n|(?<=[.!?])\s+/u)
+    .map((clause) => normalizeText(clause))
+    .filter((clause) => clause.length >= 8 && !looksLikeQuestion(clause));
+  for (const key of ['projectScopeItems', 'documents']) {
+    for (const option of Object.keys(CHECKLIST_KEYWORDS[key] || {})) {
+      const evidence = clauses.find((clause) => checklistOptionSupported(key, option, clause));
+      if (evidence) items.push({ key, value: [option], evidence });
+    }
+  }
+
+  return { items };
+}
+
+function normalizeSuggestionsV2(parsed) {
+  if (Array.isArray(parsed?.items)) return parsed.items;
+  if (parsed?.analysis && typeof parsed.analysis === 'object') {
+    return Object.entries(parsed.analysis)
+      .filter(([, value]) => (Array.isArray(value) && value.length) || (typeof value === 'string' && value.trim()))
+      .map(([key, value]) => ({ key, value, evidence: parsed.evidence?.[key] || '' }));
+  }
+  return [];
+}
+
+function plausibleSuggestionV2(field, value) {
+  const normalized = lowerTr(value);
+  if (!value || MISSING_VALUE_RE.test(value) || looksLikeQuestion(value)) return false;
+  if (SHORT_FIELDS.has(field.key) && value.length > SHORT_FIELD_MAX) return false;
+  if (/danışman:|müşteri:/iu.test(value) && value.length > 240) return false;
+  if (field.key === 'companyName' && value.length < 3) return false;
+  if (field.key === 'taxNo' && !/^\d{6,20}$/.test(digitsOnly(value))) return false;
+  if (field.key === 'foundingDate' && !/\b(?:18|19|20)\d{2}\b/.test(value)) return false;
+  if (field.key === 'employees' && !/\d/.test(value)) return false;
+  if (field.key === 'phone' && digitsOnly(value).length < 7) return false;
+  if (field.key === 'web' && !/^(?:https?:\/\/|www\.)[^\s]+\.[^\s]+$/iu.test(value)) return false;
+  if (field.key === 'email' && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/iu.test(value)) return false;
+  if (field.key === 'customerCount' && !/\d/.test(value)) return false;
+  if (field.key === 'sectorNace' && !/\b\d{2}(?:\.\d{1,2})?\b/u.test(value)) return false;
+  if (field.key === 'foreignTrade' && !/(?:diş\s+ticaret|ihracat|ithalat|ihraç|yurt\s+dişina\s+satiş)/u.test(normalized)) return false;
+  return true;
+}
+
+function evidenceFitsField(field, evidence) {
+  const normalized = lowerTr(evidence);
+  if (field.key === 'sectorNace') {
+    return /\bnace(?:\s+kodu)?\b/u.test(normalized) && /\b\d{2}(?:\.\d{1,2})?\b/u.test(normalized);
+  }
+  if (field.key === 'locations') {
+    return /\b(?:adres|tesis|fabrika|yerleşke|organize\s+sanayi|osb|metrekare|m²|lokasyon|ilçe|şube|atölye|depo)\b/u.test(normalized);
+  }
+  if (field.key === 'address') {
+    return /\b(?:adres|mahalle|mahallesi|cadde|caddesi|sokak|bulvar|no|kat|daire|ilçe|organize\s+sanayi|osb)\b/u.test(normalized);
+  }
+  if (field.key === 'foreignTrade') {
+    return /(?:diş\s+ticaret|ihracat|ithalat|ihraç|yurt\s+dişina\s+satiş)/u.test(normalized);
+  }
+  if (field.key === 'rdCapability') {
+    return /\b(?:ar-ge|arge|araştirma|geliştirme|mühendis|laboratuvar|patent|tübitak|kosgeb|proje ekibi)\b/u.test(normalized);
+  }
+  if (field.key === 'currentActivities') {
+    return /\b(?:faaliyet|üretim|üretiyoruz|üretiyor|yapiyoruz|yapiyor|sunuyoruz|hizmet veriyoruz|işletiyoruz|gerçekleştiriyoruz)\b/u.test(normalized);
+  }
+  return true;
+}
+
+const GROUNDING_STOP_WORDS = new Set([
+  've', 'veya', 'ile', 'bir', 'bu', 'şu', 'da', 'de', 'için', 'olarak', 'var', 'yok'
+]);
+
+function groundingTokens(text) {
+  return (lowerTr(text).match(/[\p{L}\p{N}]+/gu) || [])
+    .filter((token) => /^\d+$/u.test(token) || (token.length >= 3 && !GROUNDING_STOP_WORDS.has(token)));
+}
+
+function valueIsGrounded(value, evidence) {
+  const valueTokens = groundingTokens(value);
+  if (!valueTokens.length) return false;
+  const evidenceTokens = groundingTokens(evidence);
+
+  const valueNumbers = valueTokens.filter((token) => /^\d+$/u.test(token));
+  const evidenceNumbers = new Set(evidenceTokens.filter((token) => /^\d+$/u.test(token)));
+  if (valueNumbers.some((number) => !evidenceNumbers.has(number))) return false;
+
+  const wordTokens = valueTokens.filter((token) => !/^\d+$/u.test(token));
+  if (!wordTokens.length) return true;
+  const supported = wordTokens.filter((token) => evidenceTokens.some((candidate) =>
+    candidate === token ||
+    (Math.min(candidate.length, token.length) >= 4 && (candidate.startsWith(token) || token.startsWith(candidate)))
+  ));
+  return supported.length / wordTokens.length >= 0.7;
+}
+
+export function validateExtractionResult(parsed, fields, transcript = '', lineMap = null) {
+  const fieldMap = new Map(fields.map((field) => [field.key, field]));
+  const extracted = {};
+  const evidence = {};
+  const rejected = [];
+
+  for (const item of normalizeSuggestionsV2(parsed)) {
+    const inferredKey = item?.key || Object.keys(item || {}).find((candidate) => fieldMap.has(candidate));
+    const key = String(inferredKey || '').trim();
+    const field = fieldMap.get(key);
+
+    if (!field) {
+      rejected.push(`${key || '(empty)'}: unknown field`);
+      continue;
+    }
+    let quote;
+    if (Array.isArray(item?.evidenceLineIds) && lineMap) {
+      const citedLines = [...new Set(item.evidenceLineIds)]
+        .map((id) => {
+          const match = String(id).match(/^L?(\d+)$/i);
+          const normalizedId = match ? `L${match[1].padStart(4, '0')}` : String(id);
+          return lineMap.get(normalizedId);
+        })
+        .filter(Boolean);
+      const answerLines = citedLines.filter((line) => !looksLikeQuestion(line));
+      if (!answerLines.length) {
+        rejected.push(`${key}: evidence has no answer lines`);
+        continue;
+      }
+      quote = normalizeText(answerLines.join(' '));
+    } else {
+      quote = normalizeText(item?.evidence || '');
+      if (!evidenceAppears(quote, transcript)) {
+        rejected.push(`${key}: evidence not found in transcript`);
+        continue;
+      }
+      if (looksLikeQuestion(quote)) {
+        rejected.push(`${key}: evidence is a question`);
+        continue;
+      }
+    }
+    if (!evidenceFitsField(field, quote)) {
+      rejected.push(`${key}: evidence does not support this field`);
+      continue;
+    }
+
+    if (field.type === 'checklist') {
+      const selected = field.options.filter((option) => checklistOptionSupported(key, option, quote));
+      if (!selected.length) {
+        rejected.push(`${key}: checklist selection lacks answer evidence`);
+        continue;
+      }
+      extracted[key] = [...new Set([...(extracted[key] || []), ...selected])];
+      evidence[key] = quote;
+      continue;
+    }
+
+    const rawValue = item?.key ? item.value : item?.[key];
+    let value = Array.isArray(rawValue)
+      ? rawValue.map((part) => normalizeText(part)).filter(Boolean).join('; ')
+      : normalizeText(rawValue || '');
+    if (key === 'taxNo') value = digitsOnly(value);
+    if (key === 'foundingDate') value = value.match(/\b(?:18|19|20)\d{2}\b/)?.[0] || value;
+    if (key === 'web') value = value.replace(/[.,;]+$/, '');
+    if (!plausibleSuggestionV2(field, value)) {
+      rejected.push(`${key}: implausible value`);
+      continue;
+    }
+    if (!valueIsGrounded(value, quote)) {
+      rejected.push(`${key}: value adds details not supported by evidence`);
+      continue;
+    }
+
+    extracted[key] = value;
+    evidence[key] = quote;
+  }
+
+  return { extracted, evidence, rejected };
+}
+
 export async function extractAnalysisFromTranscript({ projectType, transcript }) {
   const fields = allFields(projectType);
   const modelTranscript = transcriptForModel(transcript);
+  const numberedTranscript = numberTranscriptLines(modelTranscript);
   let parsed;
 
   if (IMPORT.extractionProvider === 'openai') {
     parsed = await extractWithOpenAI({ fields, transcript: modelTranscript });
   } else if (IMPORT.extractionProvider === 'ollama') {
-    parsed = await extractWithOllama({ fields, transcript: modelTranscript });
+    parsed = await extractWithOllama({ fields, transcript: numberedTranscript.text });
   } else {
     throw new Error(`Bilinmeyen form çıkarım sağlayıcısı: ${IMPORT.extractionProvider}`);
   }
 
-  const heuristic = heuristicAnalysis(transcript);
-  const model = IMPORT.extractionProvider === 'ollama'
-    ? cleanSuggestions(parsed, fields, transcript)
-    : { extracted: cleanExtracted(parsed.analysis || {}, fields, transcript), evidence: {}, rejected: [] };
-  const extracted = { ...model.extracted, ...heuristic };
-  const evidence = { ...model.evidence };
-  for (const key of Object.keys(heuristic)) {
-    if (!evidence[key]) evidence[key] = 'Kural tabanlı çıkarım';
+  const model = validateExtractionResult(parsed, fields, transcript, numberedTranscript.lineMap);
+  const heuristic = validateExtractionResult(heuristicSuggestionsV2(transcript), fields, transcript);
+  const extracted = { ...heuristic.extracted, ...model.extracted };
+  for (const field of fields.filter((candidate) => candidate.type === 'checklist')) {
+    const combined = [...(heuristic.extracted[field.key] || []), ...(model.extracted[field.key] || [])];
+    if (combined.length) extracted[field.key] = [...new Set(combined)];
   }
-  const rejected = model.rejected.filter((item) => {
+  const evidence = { ...heuristic.evidence, ...model.evidence };
+  const rejected = [...model.rejected, ...heuristic.rejected].filter((item) => {
     const key = item.split(':')[0];
     return !extracted[key];
   });
@@ -609,8 +913,10 @@ export async function extractAnalysisFromTranscript({ projectType, transcript })
     evidence,
     notes: [
       ...(Array.isArray(parsed.notes) ? parsed.notes.filter(Boolean).map(String) : []),
-      ...rejected.slice(0, 8).map((x) => `Reddedildi: ${x}`)
-    ]
+      ...rejected.map((x) => `Reddedildi: ${x}`)
+    ],
+    rawResult: parsed,
+    rejected
   };
 }
 
@@ -639,24 +945,50 @@ async function extractWithOpenAI({ fields, transcript }) {
 }
 
 async function extractWithOllama({ fields, transcript }) {
-  const prompt = evidencePrompt({ fields, transcript });
-
   const baseUrl = IMPORT.ollamaUrl.replace(/\/+$/, '');
+  const batches = fields.length > 12
+    ? [fields.slice(0, 12), fields.slice(12, 24), fields.slice(24)]
+    : [fields];
+  const parsedBatches = [];
+
+  for (const batch of batches.filter((items) => items.length)) {
+    parsedBatches.push(await requestOllamaBatch({ baseUrl, fields: batch, transcript }));
+  }
+
+  return {
+    items: parsedBatches.flatMap((batch) => Array.isArray(batch.items) ? batch.items : []),
+    notes: parsedBatches.flatMap((batch) => Array.isArray(batch.notes) ? batch.notes : []),
+    batches: parsedBatches
+  };
+}
+
+async function requestOllamaBatch({ baseUrl, fields, transcript }) {
+  const prompt = evidencePrompt({ fields, transcript });
   let response;
-  try {
-    response = await fetch(`${baseUrl}/api/generate`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        model: IMPORT.ollamaModel,
-        prompt,
-        stream: false,
-        format: 'json',
-        options: { temperature: 0 }
-      })
-    });
-  } catch (err) {
-    throw new Error(`Ollama bağlantısı kurulamadı (${baseUrl}). Ollama çalışıyor mu? ${err.message}`);
+  let connectionError;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      response = await fetch(`${baseUrl}/api/generate`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model: IMPORT.ollamaModel,
+          prompt,
+          stream: false,
+          format: schemaForEvidenceItems(fields),
+          keep_alive: '10m',
+          options: { temperature: 0, num_ctx: 16384, num_predict: 4096 }
+        })
+      });
+      break;
+    } catch (err) {
+      connectionError = err;
+      if (attempt < 3) await new Promise((resolve) => setTimeout(resolve, attempt * 750));
+    }
+  }
+  if (!response) {
+    const cause = connectionError?.cause?.code || connectionError?.message || 'unknown connection error';
+    throw new Error(`Ollama bağlantısı kurulamadı (${baseUrl}). Ollama çalışıyor mu? ${cause}`);
   }
 
   const text = await response.text();

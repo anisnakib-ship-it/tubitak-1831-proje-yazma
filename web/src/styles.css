@@ -326,6 +326,11 @@ body::before {
 .import-review li { display: flex; flex-direction: column; gap: 2px; }
 .import-review strong { color: var(--ink); }
 .import-review span { color: var(--muted); overflow-wrap: anywhere; }
+.import-history { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line-soft); padding-top: 12px; }
+.import-history h3 { margin: 0 0 2px; font-size: 13px; color: var(--ink); }
+.import-subhead { display: block; margin-top: 10px; font-size: 11px; text-transform: uppercase; color: var(--muted); }
+.import-transcript-preview { max-height: 260px; overflow: auto; margin: 6px 0 0; padding: 9px; border: 1px solid var(--line-soft); border-radius: 6px; background: var(--input-bg); color: var(--ink-soft); font: 12px/1.5 var(--body); white-space: pre-wrap; overflow-wrap: anywhere; }
+.import-error-text { color: var(--err); font-size: 12px; overflow-wrap: anywhere; }
 
 /* Generated sections w/ preview */
 .sections { margin: 12px 0 0; padding: 0; list-style: none; counter-reset: s; }

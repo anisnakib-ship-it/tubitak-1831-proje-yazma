@@ -15,17 +15,34 @@ app.use(cors());
 app.use(express.json({ limit: '25mb' }));
 
 // Sağlık / yapılandırma durumu
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  const transcriptionConfigured = IMPORT.transcriptionProvider !== 'openai' || !!OPENAI.apiKey;
+  let extractionConfigured = IMPORT.extractionProvider !== 'openai' || !!OPENAI.apiKey;
+  let ollamaReachable = null;
+
+  if (IMPORT.extractionProvider === 'ollama') {
+    try {
+      const response = await fetch(`${IMPORT.ollamaUrl.replace(/\/+$/, '')}/api/tags`, {
+        signal: AbortSignal.timeout(2000)
+      });
+      ollamaReachable = response.ok;
+    } catch {
+      ollamaReachable = false;
+    }
+    extractionConfigured = ollamaReachable;
+  }
+
   res.json({
     ok: true,
     engine: 'chatgpt-web',
     chatgptProfile: fs.existsSync(CHATGPT.profileDir),
     googleConfigured: !!(GOOGLE.clientId && GOOGLE.clientSecret && GOOGLE.refreshToken),
     openaiConfigured: !!OPENAI.apiKey,
-    importConfigured: IMPORT.transcriptionProvider !== 'openai' || !!OPENAI.apiKey,
+    importConfigured: transcriptionConfigured && extractionConfigured,
     transcriptionProvider: IMPORT.transcriptionProvider,
     extractionProvider: IMPORT.extractionProvider,
     extractionModel: IMPORT.extractionProvider === 'ollama' ? IMPORT.ollamaModel : OPENAI.extractionModel,
+    ollamaReachable,
     vaultPath: VAULT_PATH
   });
 });
