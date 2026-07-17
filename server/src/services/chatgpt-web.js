@@ -23,7 +23,11 @@ const SEL = {
   noAuthModal: '#modal-no-auth-soft-rate-limit-inline-auth, [data-testid="modal-no-auth-soft-rate-limit-inline-auth"]',
   // Abonelik doğrulanamadığında (ödeme başarısız/plan süresi dolmuş/kullanım sınırı)
   // görünen modal. Tüm sayfayı kaplar ve tıklamaları yutar → "send" tıklaması zaman aşımına uğrar.
-  subscriptionFailedModal: '#modal-subscription-failure, [data-testid="modal-subscription-failure"]'
+  subscriptionFailedModal: '#modal-subscription-failure, [data-testid="modal-subscription-failure"]',
+  // ChatGPT artık OTURUM AÇMAMIŞ kullanıcılara da kompozitörü gösteriyor. Gerçek
+  // girişi anonim durumdan ayırt etmek için "Giriş yap / Log in" düğmesine bakılır:
+  // düğme görünüyorsa oturum açılmamıştır (kompozitör görünse bile).
+  loginButton: '[data-testid="login-button"], [data-testid="mobile-login-button"], button:has-text("Log in"), button:has-text("Giriş yap")'
 };
 
 let contextPromise = null;     // tek bir kalıcı bağlam
@@ -82,6 +86,12 @@ async function isLoggedIn(page, timeout = 8000) {
   // varsa oturum aslında kapalı/süresi dolmuş demektir.
   const noAuthModal = page.locator(SEL.noAuthModal).first();
   if (await noAuthModal.isVisible().catch(() => false)) return false;
+  // Anonim (oturum açılmamış) ChatGPT de kompozitörü gösterir ama "Giriş yap / Log in"
+  // düğmesi görünür kalır. Düğme görünüyorsa GERÇEKTEN giriş yapılmamıştır — aksi
+  // hâlde giriş penceresi anonim kompozitörü görüp hemen kapanır ve anonim oturum
+  // kaydeder (tüm üretimler anonim ChatGPT'ye gider).
+  const loginBtn = page.locator(SEL.loginButton).first();
+  if (await loginBtn.isVisible().catch(() => false)) return false;
   return true;
 }
 
