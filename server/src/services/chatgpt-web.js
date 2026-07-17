@@ -38,7 +38,15 @@ async function getContext() {
     const opts = {
       headless: CHATGPT.headless,
       viewport: { width: 1280, height: 900 },
-      args: ['--disable-blink-features=AutomationControlled']
+      args: [
+        '--disable-blink-features=AutomationControlled',
+        // Linux'ta Chromium çerezleri masaüstü anahtarlığıyla (gnome-keyring/kwallet)
+        // şifreler. Giriş VNC/XFCE oturumunda (anahtarlık açık) yapılıp uygulama pm2
+        // altında (anahtarlık YOK) çalışınca çerezler ÇÖZÜLEMEZ → oturum "anonim"
+        // görünür. Sabit gömülü anahtar kullanmaya zorlayarak çerezleri iki başlatma
+        // arasında taşınabilir kılar (giriş ve üretim aynı anahtarı kullanır).
+        '--password-store=basic'
+      ]
     };
     if (CHATGPT.channel) opts.channel = CHATGPT.channel;
     contextPromise = chromium.launchPersistentContext(CHATGPT.profileDir, opts).then(async (ctx) => {
